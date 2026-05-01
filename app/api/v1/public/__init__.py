@@ -1,0 +1,1 @@
+"""Public route wiring namespace."""

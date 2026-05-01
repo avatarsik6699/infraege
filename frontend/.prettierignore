@@ -1,0 +1,27 @@
+# Dependencies
+node_modules
+
+# Build and generated artifacts
+build
+.react-router
+playwright-report
+test-results
+coverage
+.nyc_output
+
+# Runtime and cache artifacts
+.eslintcache
+*.tsbuildinfo
+*.log
+*.pid
+*.pid.lock
+
+# Package manager and env artifacts
+pnpm-lock.yaml
+.env
+.env.*
+
+# OS/editor artifacts
+.DS_Store
+.idea
+.vscode
