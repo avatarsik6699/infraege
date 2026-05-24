@@ -39,9 +39,7 @@ async def test_register_returns_tokens_and_persists_consent(
     assert data["access_token"]
     assert data["refresh_token"]
 
-    user = await db_session.scalar(
-        select(User).where(User.email == "registered@example.com")
-    )
+    user = await db_session.scalar(select(User).where(User.email == "registered@example.com"))
     assert user is not None
     assert user.role == UserRole.user
     assert user.consent_152fz is True

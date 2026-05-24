@@ -5,11 +5,7 @@ import { authQueryKeys } from '@shared/api/keys';
 import { jwtService } from '@shared/services/jwt-service';
 import type { components } from '@shared/types/schema';
 
-type LoginRequest = components['schemas']['LoginRequest'];
-type RefreshRequest = components['schemas']['RefreshRequest'];
-type RegisterRequest = components['schemas']['RegisterRequest'];
 type TokenPair = components['schemas']['TokenPair'];
-type User = components['schemas']['UserOut'];
 
 export function useAuthToken() {
 	const queryClient = useQueryClient();
@@ -24,12 +20,12 @@ export function useAuthToken() {
 }
 
 export function useMe() {
-	const { data: token } = useAuthToken();
+	const tokenQuery = useAuthToken();
 
-	return useQuery<User>({
+	return useQuery({
 		queryKey: authQueryKeys.me,
-		enabled: Boolean(token?.access_token),
-		queryFn: () => api.get<User>('/public/auth/me'),
+		enabled: Boolean(tokenQuery.data?.access_token),
+		queryFn: () => api.get('/api/v1/public/auth/me'),
 	});
 }
 
@@ -37,10 +33,8 @@ export function useLoginMutation() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (payload: LoginRequest) =>
-			api.post<TokenPair, LoginRequest>('/public/auth/login', {
-				body: payload,
-			}),
+		mutationFn: (payload: components['schemas']['LoginRequest']) =>
+			api.post('/api/v1/public/auth/login', { body: payload }),
 		onSuccess: tokens => {
 			jwtService.set(queryClient, tokens);
 			queryClient.invalidateQueries({ queryKey: authQueryKeys.me });
@@ -52,10 +46,8 @@ export function useRegisterMutation() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (payload: RegisterRequest) =>
-			api.post<TokenPair, RegisterRequest>('/public/auth/register', {
-				body: payload,
-			}),
+		mutationFn: (payload: components['schemas']['RegisterRequest']) =>
+			api.post('/api/v1/public/auth/register', { body: payload }),
 		onSuccess: tokens => {
 			jwtService.set(queryClient, tokens);
 			queryClient.invalidateQueries({ queryKey: authQueryKeys.me });
@@ -67,10 +59,8 @@ export function useRefreshMutation() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (payload: RefreshRequest) =>
-			api.post<TokenPair, RefreshRequest>('/public/auth/refresh', {
-				body: payload,
-			}),
+		mutationFn: (payload: components['schemas']['RefreshRequest']) =>
+			api.post('/api/v1/public/auth/refresh', { body: payload }),
 		onSuccess: tokens => {
 			jwtService.set(queryClient, tokens);
 			queryClient.invalidateQueries({ queryKey: authQueryKeys.me });
@@ -82,7 +72,7 @@ export function useLogoutMutation() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: () => api.post<{ message: string }, never>('/public/auth/logout', {}),
+		mutationFn: () => api.post('/api/v1/public/auth/logout', {}),
 		onSettled: () => {
 			jwtService.set(queryClient, null);
 			queryClient.removeQueries({ queryKey: authQueryKeys.me });

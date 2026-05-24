@@ -20,26 +20,40 @@ configure_logging()
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     await init_db()
-    yield
-    await close_db()
+    try:
+        yield
+    finally:
+        await close_db()
 
 
-app = FastAPI(
-    title="Template App",
-    version="0.1.0",
-    description="Reusable FastAPI backend template",
-    lifespan=lifespan,
-)
+def create_app() -> FastAPI:
+    docs_url = None if settings.is_production else "/docs"
+    redoc_url = None if settings.is_production else "/redoc"
+    openapi_url = None if settings.is_production else "/openapi.json"
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    app = FastAPI(
+        title="Template App",
+        version="0.1.0",
+        description="Reusable FastAPI backend template",
+        lifespan=lifespan,
+        docs_url=docs_url,
+        redoc_url=redoc_url,
+        openapi_url=openapi_url,
+    )
 
-register_middleware(app)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.include_router(api_v1_router)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    register_middleware(app)
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    app.include_router(api_v1_router)
+    return app
+
+
+app = create_app()

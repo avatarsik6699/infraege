@@ -2,6 +2,8 @@ import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
+import { i18nStorage } from '@shared/lib/i18n-storage';
+
 const resources = {
 	en: {
 		common: {
@@ -113,12 +115,19 @@ const resources = {
 	},
 };
 
-void i18n.use(LanguageDetector).use(initReactI18next).init({
-	resources,
-	lng: 'en',
-	fallbackLng: 'en',
-	defaultNS: 'common',
-	interpolation: { escapeValue: false },
+void i18n
+	.use(LanguageDetector)
+	.use(initReactI18next)
+	.init({
+		resources,
+		lng: i18nStorage.read() ?? 'en',
+		fallbackLng: 'en',
+		defaultNS: 'common',
+		interpolation: { escapeValue: false },
+	});
+
+i18n.on('languageChanged', function persistLanguageFx(language) {
+	i18nStorage.write(language);
 });
 
 export { i18n };

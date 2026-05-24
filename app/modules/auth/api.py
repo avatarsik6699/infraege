@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 
+from app.core.config import settings
+from app.core.rate_limit import limiter
 from app.modules.auth.dependencies import get_auth_service, get_current_user
 from app.modules.auth.schemas import (
     AccountDeletionResponse,
@@ -15,7 +17,9 @@ router = APIRouter(prefix="/public/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=TokenPair)
+@limiter.limit(settings.AUTH_RATE_LIMIT)
 async def login(
+    request: Request,
     body: LoginRequest,
     service: AuthService = Depends(get_auth_service),
 ) -> TokenPair:
@@ -23,7 +27,9 @@ async def login(
 
 
 @router.post("/register", response_model=TokenPair, status_code=status.HTTP_201_CREATED)
+@limiter.limit(settings.AUTH_RATE_LIMIT)
 async def register(
+    request: Request,
     body: RegisterRequest,
     service: AuthService = Depends(get_auth_service),
 ) -> TokenPair:
@@ -31,7 +37,9 @@ async def register(
 
 
 @router.post("/refresh", response_model=TokenPair)
+@limiter.limit(settings.AUTH_RATE_LIMIT)
 async def refresh(
+    request: Request,
     body: RefreshRequest,
     service: AuthService = Depends(get_auth_service),
 ) -> TokenPair:

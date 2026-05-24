@@ -29,11 +29,33 @@ os.environ.setdefault("DATABASE_URL", TEST_DATABASE_URL)
 os.environ.setdefault("SECRET_KEY", "test-secret-key-for-ci-only")
 os.environ.setdefault("REFRESH_TOKEN_EXPIRE_DAYS", "14")
 
+from app.core.rate_limit import limiter  # noqa: E402
 from app.db.base import Base  # noqa
 from app.db.session import get_db  # noqa: E402
 from app.main import app  # noqa: E402
-from app.modules.auth.utils import hash_password  # noqa: E402
+from app.modules.auth.utils import create_access_token, hash_password  # noqa: E402
 from app.modules.users.models import User, UserRole  # noqa: E402
+
+
+class TemplateTestClient(AsyncClient):
+    db_session: AsyncSession
+
+    async def create_user_token(
+        self,
+        email: str,
+        role: UserRole = UserRole.user,
+        password: str = "Pass1234!",
+    ) -> str:
+        user = User(
+            email=email,
+            hashed_password=hash_password(password),
+            role=role,
+            consent_152fz=True,
+            is_active=True,
+        )
+        self.db_session.add(user)
+        await self.db_session.flush()
+        return create_access_token({"sub": str(user.id), "role": user.role.value})
 
 
 @pytest.fixture(scope="session")
@@ -55,7 +77,7 @@ async def test_engine():
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-    
+
     await engine.dispose()
 
 
@@ -63,9 +85,7 @@ async def test_engine():
 async def db_session(test_engine) -> AsyncSession:
     session_factory = async_sessionmaker(test_engine, expire_on_commit=False)
     async with session_factory() as session:
-        existing_admin = await session.scalar(
-            select(User).where(User.email == "admin@example.com")
-        )
+        existing_admin = await session.scalar(select(User).where(User.email == "admin@example.com"))
         if existing_admin is None:
             session.add(
                 User(
@@ -83,10 +103,13 @@ async def db_session(test_engine) -> AsyncSession:
 
 @pytest.fixture()
 async def client(db_session: AsyncSession) -> AsyncClient:
+    limiter.reset()
+
     async def override_get_db() -> AsyncSession:
         yield db_session
 
     app.dependency_overrides[get_db] = override_get_db
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with TemplateTestClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        ac.db_session = db_session
         yield ac
     app.dependency_overrides.clear()

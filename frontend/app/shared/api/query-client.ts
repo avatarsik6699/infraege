@@ -8,6 +8,7 @@ const QUERY_STALE_TIME_MS = 1000 * 60 * 5;
 const QUERY_GC_TIME_MS = 1000 * 60 * 10;
 const RETRYABLE_SERVER_STATUSES = new Set([502, 503, 504]);
 const MAX_QUERY_RETRIES = 2;
+
 export function createQueryClient(): QueryClient {
 	return new QueryClient({
 		queryCache: new QueryCache({
@@ -22,6 +23,10 @@ export function createQueryClient(): QueryClient {
 		mutationCache: new MutationCache({
 			onError: (error, _variables, _context, mutation) => {
 				if (mutation.meta?.disableGlobalErrorHandler === true) {
+					return;
+				}
+
+				if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
 					return;
 				}
 

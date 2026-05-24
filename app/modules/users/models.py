@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Boolean, Enum, String
+from sqlalchemy import Boolean, DateTime, Enum, String
 from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -25,5 +25,5 @@ class User(UUIDMixin, TimestampMixin, Base):
         server_default=UserRole.user.value,
     )
     consent_152fz: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    consent_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

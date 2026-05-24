@@ -4,6 +4,9 @@ set -e
 echo "Running Alembic migrations..."
 uv run alembic upgrade head
 
+echo "Running database seeders..."
+uv run python scripts/seed.py
+
 echo "Starting Uvicorn..."
 # exec replaces the shell process with uvicorn so it becomes PID 1 and receives SIGTERM directly → graceful shutdown
 if [ "${APP_ENV}" = "development" ]; then

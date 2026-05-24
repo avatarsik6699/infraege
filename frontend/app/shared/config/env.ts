@@ -18,11 +18,14 @@ type ServerEnvSchema = {
 };
 
 function readClientEnv(): ClientEnvSchema {
-	const fallbackApiBaseUrl = 'http://localhost:8000/api/v1';
-	const apiBaseUrlValue = import.meta.env.VITE_API_BASE_URL?.trim() || fallbackApiBaseUrl;
+	const fallbackApiBaseUrl = 'http://localhost:8000';
+	const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+	if (import.meta.env.PROD && !configuredApiBaseUrl) {
+		throw new Error('VITE_API_BASE_URL is required for production builds');
+	}
 
 	return {
-		VITE_API_BASE_URL: apiBaseUrlValue,
+		VITE_API_BASE_URL: configuredApiBaseUrl || fallbackApiBaseUrl,
 	};
 }
 
@@ -35,9 +38,11 @@ function readServerEnv(): ServerEnvSchema {
 	};
 }
 
-function validateApiBaseUrl(value: string): string {
+export function normalizeApiBaseUrl(value: string): string {
 	try {
-		return new URL(value).toString();
+		const url = new URL(value);
+		url.pathname = url.pathname.replace(/\/api\/v1\/?$/, '/');
+		return url.toString();
 	} catch {
 		throw new Error(`Invalid API base URL value: ${value}`);
 	}
@@ -47,14 +52,14 @@ function readClientApiBaseUrl(): string {
 	const clientEnv = readClientEnv();
 
 	// Validate in all modes to avoid silently shipping broken API endpoints.
-	return validateApiBaseUrl(clientEnv.VITE_API_BASE_URL);
+	return normalizeApiBaseUrl(clientEnv.VITE_API_BASE_URL);
 }
 
 function readServerApiBaseUrl(): string {
 	const serverEnv = readServerEnv();
 	const fallbackUrl = serverEnv.API_BASE_URL ?? readClientEnv().VITE_API_BASE_URL;
 
-	return validateApiBaseUrl(serverEnv.API_BASE_INTERNAL_URL ?? fallbackUrl);
+	return normalizeApiBaseUrl(serverEnv.API_BASE_INTERNAL_URL ?? fallbackUrl);
 }
 
 const client: EnvTypes.Client = {

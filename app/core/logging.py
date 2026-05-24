@@ -43,7 +43,7 @@ def configure_logging() -> None:
     logging.basicConfig(level=settings.LOG_LEVEL.upper(), format="%(message)s")
 
     is_dev = settings.APP_ENV == "development"
-    
+
     renderer = (
         structlog.dev.ConsoleRenderer(colors=True)
         if is_dev

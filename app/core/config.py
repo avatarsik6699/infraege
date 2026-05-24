@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     LOG_LEVEL: str = "INFO"
     API_BASE_URL: str = "http://localhost:8000"
+    AUTH_RATE_LIMIT: str = "20/minute"
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
@@ -35,6 +36,10 @@ class Settings(BaseSettings):
                 return parsed
             return [item.strip() for item in stripped.split(",") if item.strip()]
         return v
+
+    @property
+    def is_production(self) -> bool:
+        return self.APP_ENV.lower() == "production"
 
 
 settings = Settings()

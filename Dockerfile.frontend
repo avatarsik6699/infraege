@@ -21,6 +21,9 @@ CMD ["pnpm", "dev"]
 # Stage 3: production build
 FROM deps AS builder
 
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
 COPY --chown=node:node . .
 RUN pnpm build
 

@@ -1,5 +1,7 @@
-.PHONY: dev install migrate lint test deploy deploy-logs deploy-ps
+.PHONY: dev install migrate seed seed-all migrate-seed lint test deploy deploy-logs deploy-ps
 
+# Running services through Docker Compose is the normal development path.
+# This direct uvicorn target is kept for emergency debugging.
 dev:
 	uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
@@ -8,6 +10,14 @@ install:
 
 migrate:
 	uv run alembic upgrade head
+
+seed:
+	uv run python scripts/seed.py
+
+seed-all:
+	uv run python scripts/seed.py --all
+
+migrate-seed: migrate seed
 
 lint:
 	uv run ruff check . && uv run ruff format --check .
