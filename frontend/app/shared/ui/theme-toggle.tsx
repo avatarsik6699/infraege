@@ -1,7 +1,7 @@
 import { useTheme } from 'next-themes';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@shared/ui/button';
 
 const themes = ['light', 'dark', 'system'] as const;
 

@@ -3,10 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
 
 import { useLogoutMutation, useSessionSummary } from '@shared/api/auth';
+import { Button } from '@shared/ui/button';
 import { LanguageSwitcher } from '@shared/ui/language-switcher';
 import { ThemeToggle } from '@shared/ui/theme-toggle';
-
-import { Button } from '@/components/ui/button';
 
 function maskToken(value: string): string {
 	if (value.length <= 12) return '••••••';
@@ -86,7 +85,12 @@ export function AppTopBar() {
 								<div className='flex items-center gap-2 rounded-md border border-border px-2 py-1'>
 									<span className='text-xs text-muted-foreground'>{t('auth.apiToken')}</span>
 									<code className='max-w-[220px] truncate text-xs'>{tokenPreview}</code>
-									<Button type='button' size='sm' variant='ghost' onClick={() => setIsTokenVisible(current => !current)}>
+									<Button
+										type='button'
+										size='sm'
+										variant='ghost'
+										onClick={() => setIsTokenVisible(current => !current)}
+									>
 										{isTokenVisible ? t('auth.cta.hide') : t('auth.cta.show')}
 									</Button>
 									<Button type='button' size='sm' variant='ghost' onClick={() => void onCopyToken()}>
@@ -94,9 +98,17 @@ export function AppTopBar() {
 									</Button>
 								</div>
 								<span className='text-xs text-muted-foreground'>{t('auth.swaggerHint')}</span>
-								{copyState === 'success' ? <span className='text-xs text-emerald-600'>{t('auth.copySuccess')}</span> : null}
+								{copyState === 'success' ? (
+									<span className='text-xs text-emerald-600'>{t('auth.copySuccess')}</span>
+								) : null}
 								{copyState === 'error' ? <span className='text-xs text-destructive'>{t('auth.copyError')}</span> : null}
-								<Button type='button' size='sm' variant='ghost' disabled={logoutMutation.isPending} onClick={() => logoutMutation.mutate()}>
+								<Button
+									type='button'
+									size='sm'
+									variant='ghost'
+									disabled={logoutMutation.isPending}
+									onClick={() => logoutMutation.mutate()}
+								>
 									{t('auth.cta.signOut')}
 								</Button>
 							</>

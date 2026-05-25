@@ -20,10 +20,9 @@ services:
       - ./alembic:/app/alembic
 
   frontend:
-    # Run as the host user so bind-mounted writes (reports, build artifacts) stay owned
-    # by the developer on the host. Defaults to 1000:1000, the standard UID on
-    # most Linux dev boxes and WSL. Override per-shell:  UID=$(id -u) GID=$(id -g) docker compose up
-    user: "${UID:-1000}:${GID:-1000}"
+    # The nested node_modules volume starts empty when /app is bind-mounted.
+    # Bootstrap it as root, then run the dev server as the unprivileged node user.
+    user: root
     ports:
       - "3000:3000"
     build:
@@ -33,7 +32,15 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: ["pnpm", "dev"]
+    command:
+      - sh
+      - -lc
+      - |
+        if [ "$(stat -c %u /app/node_modules)" != "$(id -u node)" ]; then
+          chown -R node:node /app/node_modules
+        fi
+        chown node:node /home/node
+        su node -s /bin/sh -c 'CI=true pnpm install --frozen-lockfile && pnpm dev'
 
   nginx:
     volumes:

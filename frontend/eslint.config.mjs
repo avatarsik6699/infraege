@@ -11,6 +11,7 @@ export default [
 		ignores: [
 			'build/**',
 			'.react-router/**',
+			'app/shared/types/schema.ts',
 			'coverage/**',
 			'node_modules/**',
 			'playwright-report/**',

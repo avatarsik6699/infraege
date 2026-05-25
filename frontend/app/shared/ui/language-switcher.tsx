@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@shared/ui/button';
 
 const languages = [
 	{ code: 'en', label: 'EN' },

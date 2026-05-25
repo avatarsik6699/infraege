@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@shared/ui/button';
 
 export default function HomePage() {
 	const { t } = useTranslation('common');

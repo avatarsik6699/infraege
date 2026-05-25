@@ -60,6 +60,14 @@ not duplicate API DTOs by hand in frontend code. Use
 These rules are part of the template contract. They intentionally favor
 deterministic, stable implementation output.
 
+- The frontend uses FSD. Do not create `frontend/app/components` or
+  `frontend/app/lib`.
+- shadcn/ui uses Base UI primitives by default. Shared shadcn components live
+  in `frontend/app/shared/ui`, and shadcn utilities live in
+  `frontend/app/shared/lib`.
+- Import reusable UI through `@shared/ui/*`, not `@/components/ui/*`.
+- Add new shadcn components through the configured `frontend/components.json`
+  so the CLI writes to `app/shared/ui` and reuses `app/shared/lib/utils`.
 - File and directory names use kebab-case.
 - One React component per file.
 - Components are arrow functions typed as `React.FC<Props>`.

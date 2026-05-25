@@ -11,17 +11,18 @@
     "esModuleInterop": true,
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["node", "vite/client", "vitest/globals"],
-    "baseUrl": ".",
+    "rootDirs": [".", "./.react-router/types"],
     "paths": {
-      "@/*": ["app/*"],
-      "@shared/*": ["app/shared/*"],
-      "@entities/*": ["app/entities/*"],
-      "@features/*": ["app/features/*"],
-      "@widgets/*": ["app/widgets/*"],
-      "@pages/*": ["app/pages/*"]
+      "@/*": ["./app/*"],
+      "@shared/*": ["./app/shared/*"],
+      "@entities/*": ["./app/entities/*"],
+      "@features/*": ["./app/features/*"],
+      "@widgets/*": ["./app/widgets/*"],
+      "@pages/*": ["./app/pages/*"]
     }
   },
   "include": [
+    ".react-router/types/**/*",
     "app",
     "tests",
     "playwright.config.ts",
