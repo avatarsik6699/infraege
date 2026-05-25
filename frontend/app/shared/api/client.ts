@@ -1,6 +1,7 @@
 import { queryClient } from '@shared/api/query-client';
 import { env } from '@shared/config/env';
 import { runtime } from '@shared/config/runtime';
+import { isNonEmptyString, isNonNil } from '@shared/lib/type-guards';
 import { jwtService } from '@shared/services/jwt-service';
 import type { components, paths } from '@shared/types/schema';
 
@@ -68,11 +69,11 @@ function getApiBaseUrl(): string {
 }
 
 function resolvePath(path: string, pathParams?: Record<string, PathParamValue>): string {
-	if (!pathParams) return path;
+	if (!isNonNil(pathParams)) return path;
 	return path.replace(/\{([^}]+)\}/g, (_match, rawName: string) => {
 		const name = rawName.trim();
 		const value = pathParams[name];
-		if (value === undefined || value === null) throw new Error(`Missing path param: ${name}`);
+		if (!isNonNil(value)) throw new Error(`Missing path param: ${name}`);
 		return encodeURIComponent(String(value));
 	});
 }
@@ -88,9 +89,9 @@ function buildUrl(
 	const normalizedPath = resolvedPath.startsWith('/') ? resolvedPath.slice(1) : resolvedPath;
 	const url = new URL(normalizedPath, normalizedBase);
 
-	if (query) {
+	if (isNonNil(query)) {
 		for (const [key, value] of Object.entries(query)) {
-			if (value !== undefined && value !== null) url.searchParams.set(key, String(value));
+			if (isNonNil(value)) url.searchParams.set(key, String(value));
 		}
 	}
 	return url.toString();
@@ -109,7 +110,7 @@ async function attemptRefresh(): Promise<TokenPair | null> {
 
 	refreshPromise = (async () => {
 		const current = jwtService.read();
-		if (!current?.refresh_token) return null;
+		if (!isNonEmptyString(current?.refresh_token)) return null;
 
 		try {
 			const response = await fetch(buildUrl(REFRESH_PATH), {
@@ -144,7 +145,7 @@ async function request<TResponse, TBody = unknown>(
 ): Promise<TResponse> {
 	const headers = new Headers(options.headers);
 	const token = jwtService.readAccessToken(queryClient);
-	if (token && !headers.has('Authorization')) headers.set('Authorization', `Bearer ${token}`);
+	if (isNonEmptyString(token) && !headers.has('Authorization')) headers.set('Authorization', `Bearer ${token}`);
 	if (options.body !== undefined && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
 
 	const requestBody = options.rawBody ?? (options.body === undefined ? undefined : JSON.stringify(options.body)); // HTTP body, not storage.
@@ -161,7 +162,7 @@ async function request<TResponse, TBody = unknown>(
 	if (!response.ok) {
 		if (response.status === 401 && path !== REFRESH_PATH) {
 			const tokens = await attemptRefresh();
-			if (tokens) {
+			if (isNonNil(tokens)) {
 				const retryHeaders = new Headers(options.headers);
 				retryHeaders.set('Authorization', `Bearer ${tokens.access_token}`);
 				if (options.body !== undefined && !retryHeaders.has('Content-Type')) {

@@ -4,6 +4,7 @@ import type { ApiError } from '@shared/api/client';
 import { api } from '@shared/api/client';
 import { authQueryKeys } from '@shared/api/keys';
 import { queryClient } from '@shared/api/query-client';
+import { isNonNil } from '@shared/lib/type-guards';
 import { jwtService } from '@shared/services/jwt-service';
 import type { components } from '@shared/types/schema';
 
@@ -54,7 +55,7 @@ function textResponse(body: string, init: ResponseInit = {}): Response {
 
 function readRequestInit(callIndex: number): RequestInit {
 	const init = fetchMock.mock.calls[callIndex]?.[1];
-	if (!init) throw new Error(`Missing fetch init for call ${callIndex}`);
+	if (!isNonNil(init)) throw new Error(`Missing fetch init for call ${callIndex}`);
 	return init;
 }
 

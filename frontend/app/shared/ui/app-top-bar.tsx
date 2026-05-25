@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
 
 import { useLogoutMutation, useSessionSummary } from '@shared/api/auth';
+import { clipboard } from '@shared/lib/clipboard';
+import { isNonEmptyString } from '@shared/lib/type-guards';
 import { Button } from '@shared/ui/button';
 import { LanguageSwitcher } from '@shared/ui/language-switcher';
 import { ThemeToggle } from '@shared/ui/theme-toggle';
@@ -21,20 +23,21 @@ export function AppTopBar() {
 	const [copyState, setCopyState] = useState<'idle' | 'success' | 'error'>('idle');
 
 	const isCompact = pathname.startsWith('/login');
-	const tokenValue = accessToken ? `Bearer ${accessToken}` : '';
+	const tokenValue = isNonEmptyString(accessToken) ? `Bearer ${accessToken}` : '';
 	const tokenPreview = useMemo(() => {
-		if (!accessToken) return '';
+		if (!isNonEmptyString(accessToken)) return '';
 		return isTokenVisible ? tokenValue : maskToken(tokenValue);
 	}, [accessToken, isTokenVisible, tokenValue]);
 
 	const onCopyToken = async () => {
-		if (!tokenValue) return;
-		try {
-			await navigator.clipboard.writeText(tokenValue);
+		if (!isNonEmptyString(tokenValue)) return;
+		const didCopy = await clipboard.writeText(tokenValue);
+		if (didCopy) {
 			setCopyState('success');
-		} catch {
-			setCopyState('error');
+			return;
 		}
+
+		setCopyState('error');
 	};
 
 	return (
@@ -75,7 +78,7 @@ export function AppTopBar() {
 										{t('auth.signedInAs', {
 											email: meQuery.data?.email ?? t('auth.unknown'),
 											role: t(`auth.roles.${meQuery.data?.role ?? 'user'}`),
-											status: meQuery.data?.is_active ? t('auth.active') : t('auth.inactive'),
+											status: meQuery.data?.is_active === true ? t('auth.active') : t('auth.inactive'),
 										})}
 									</span>
 								)}

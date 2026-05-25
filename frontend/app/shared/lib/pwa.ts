@@ -1,9 +1,10 @@
 import { runtime } from '@shared/config/runtime';
+import { browser } from '@shared/lib/browser';
 
 let registrationStarted = false;
 
 export function registerPwaServiceWorker(): void {
-	if (!runtime.isProd || !runtime.hasWindow || registrationStarted || !('serviceWorker' in navigator)) {
+	if (!runtime.isProd || !runtime.hasWindow || registrationStarted || !browser.hasServiceWorker()) {
 		return;
 	}
 

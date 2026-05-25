@@ -2,6 +2,7 @@ import { isRouteErrorResponse } from 'react-router';
 
 import { ApiError } from '@shared/api/client';
 import { runtime } from '@shared/config/runtime';
+import { isNonEmptyString, isRecord } from '@shared/lib/type-guards';
 
 export namespace AppErrorTypes {
 	export type Source = 'route' | 'api' | 'runtime' | 'unknown';
@@ -20,19 +21,19 @@ export namespace AppErrorTypes {
 type UnknownRecord = Record<string, unknown>;
 
 function asRecord(value: unknown): UnknownRecord | null {
-	if (typeof value !== 'object' || value === null) {
+	if (!isRecord(value)) {
 		return null;
 	}
-	return value as UnknownRecord;
+	return value;
 }
 
 function getString(record: UnknownRecord | null, key: string): string | undefined {
 	const value = record?.[key];
-	return typeof value === 'string' && value.length > 0 ? value : undefined;
+	return isNonEmptyString(value) ? value : undefined;
 }
 
 function getRequestId(error: unknown): string | undefined {
-	if (error instanceof ApiError && error.requestId) {
+	if (error instanceof ApiError && isNonEmptyString(error.requestId)) {
 		return error.requestId;
 	}
 
@@ -56,7 +57,7 @@ function getStatus(error: unknown): number | undefined {
 
 function getMessage(error: unknown): string {
 	if (isRouteErrorResponse(error)) {
-		return error.statusText || 'Request failed';
+		return isNonEmptyString(error.statusText) ? error.statusText : 'Request failed';
 	}
 
 	if (error instanceof ApiError || error instanceof Error) {

@@ -2,6 +2,7 @@ import type { QueryClient } from '@tanstack/react-query';
 
 import { authQueryKeys } from '@shared/api/keys';
 import { safeLs, type SafeLsTypes } from '@shared/lib/safe-ls';
+import { isNonNil, isRecord, isString } from '@shared/lib/type-guards';
 import type { components } from '@shared/types/schema';
 
 type TokenPair = components['schemas']['TokenPair'];
@@ -17,7 +18,7 @@ export const jwtService = {
 		return safeLs.get(AUTH_TOKEN_STORAGE);
 	},
 	persist(token: TokenPair | null): void {
-		if (token) {
+		if (isNonNil(token)) {
 			safeLs.set(AUTH_TOKEN_STORAGE, token);
 		} else {
 			safeLs.remove(AUTH_TOKEN_STORAGE);
@@ -39,12 +40,9 @@ export const jwtService = {
 export type JwtService = typeof jwtService;
 
 function isTokenPair(value: unknown): value is TokenPair {
-	if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+	if (!isRecord(value)) {
 		return false;
 	}
 
-	const token = value as Record<string, unknown>;
-	return (
-		typeof token.access_token === 'string' && typeof token.refresh_token === 'string' && token.token_type === 'bearer'
-	);
+	return isString(value.access_token) && isString(value.refresh_token) && value.token_type === 'bearer';
 }

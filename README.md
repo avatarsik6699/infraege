@@ -85,6 +85,13 @@ deterministic, stable implementation output.
 - Do not use raw `JSON.parse` / `JSON.stringify` for storage. Use `@shared/lib/safe-json`. JSON request bodies are the explicit exception.
 - Do not read `import.meta.env` directly outside `@shared/config/env` and `@shared/config/runtime`.
 - Do not inline date formatting in components. Use `@shared/lib/date`.
+- Do not rely on implicit truthy/falsy checks for typed values. Use explicit
+  comparisons or the guards from `@shared/lib/type-guards`, such as `isNil`,
+  `isNull`, `isUndefined`, `isNonNil`, `isNumber`, `isString`,
+  `isNonEmptyString`, `isBoolean`, `isRecord`, and `isArrayOf`.
+- Shared project-wide type helpers live in `frontend/app/shared/types/types.ts`.
+  Add reusable type utilities under `Utils` and cross-project domain-neutral
+  types under `GlobalTypes`; keep feature-specific types close to their feature.
 
 ## Frontend SEO, SSR, and PWA contract
 

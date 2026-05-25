@@ -6,16 +6,17 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 function readPublicAppName(): string {
-	return process.env.VITE_PUBLIC_APP_NAME?.trim() || 'Template App';
+	const value = process.env.VITE_PUBLIC_APP_NAME?.trim();
+	return value !== undefined && value.length > 0 ? value : 'Template App';
 }
 
 function readPublicSiteUrl(command: string, mode: string): string {
 	const value = process.env.VITE_PUBLIC_SITE_URL?.trim();
-	if (command === 'build' && mode === 'production' && !value) {
+	if (command === 'build' && mode === 'production' && (value === undefined || value.length === 0)) {
 		throw new Error('VITE_PUBLIC_SITE_URL is required for production builds');
 	}
 
-	return value || 'http://localhost:3000';
+	return value !== undefined && value.length > 0 ? value : 'http://localhost:3000';
 }
 
 export default defineConfig(({ command, mode }) => {

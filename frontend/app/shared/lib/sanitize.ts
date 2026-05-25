@@ -1,3 +1,5 @@
+import { isNonEmptyString, isNonNil } from '@shared/lib/type-guards';
+
 /**
  * Allowlist-based sanitizer for the small subset of HTML emitted by the Phase 02
  * Markdown sync (`<h1>`, `<h2>`, `<p>`, `<strong>`, plus `<img>` for diagrams).
@@ -18,7 +20,7 @@ const STYLE_REGEX = /<style[\s\S]*?<\/style>/gi;
 const EVENT_HANDLER_REGEX = /\son[a-z]+\s*=\s*("[^"]*"|'[^']*')/gi;
 
 export function sanitizeTheoryHtml(input: string): string {
-	if (!input) {
+	if (!isNonEmptyString(input)) {
 		return '';
 	}
 
@@ -36,7 +38,7 @@ export function sanitizeTheoryHtml(input: string): string {
 		}
 
 		const allowedAttrs = ALLOWED_ATTRS_BY_TAG[tag];
-		if (!allowedAttrs) {
+		if (!isNonNil(allowedAttrs)) {
 			return `<${tag}>`;
 		}
 

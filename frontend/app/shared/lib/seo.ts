@@ -1,4 +1,5 @@
 import { env } from '@shared/config/env';
+import { isNonEmptyString } from '@shared/lib/type-guards';
 
 type SeoProfile = 'publicIndexable' | 'publicNoIndex' | 'privateNoIndex';
 
@@ -26,7 +27,7 @@ function joinUrl(baseUrl: string, pathname: string): string {
 }
 
 function buildTitle(title?: string): string {
-	if (!title || title === env.client.appName) {
+	if (!isNonEmptyString(title) || title === env.client.appName) {
 		return env.client.appName;
 	}
 

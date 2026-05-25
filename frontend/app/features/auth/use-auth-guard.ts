@@ -2,9 +2,10 @@ import { useEffect } from 'react';
 
 import { useAuthToken } from '@shared/api/auth';
 import { useRouter } from '@shared/hooks/use-router';
+import { isNonEmptyString } from '@shared/lib/type-guards';
 
 export function shouldRedirectToLogin(accessToken?: string): boolean {
-	return !accessToken;
+	return !isNonEmptyString(accessToken);
 }
 
 export function useAuthGuard() {

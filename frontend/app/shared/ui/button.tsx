@@ -2,6 +2,7 @@ import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 
+import { isNonNil } from '@shared/lib/type-guards';
 import { cn } from '@shared/lib/utils';
 
 const buttonVariants = cva(
@@ -61,7 +62,7 @@ function Button({
 			render={render}
 			{...props}
 		>
-			{render ? undefined : children}
+			{isNonNil(render) ? undefined : children}
 		</ButtonPrimitive>
 	);
 }

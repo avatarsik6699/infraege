@@ -1,5 +1,7 @@
 import { runtime } from '@shared/config/runtime';
+import { browser } from '@shared/lib/browser';
 import { safeJson, type SafeJsonTypes } from '@shared/lib/safe-json';
+import { isNonEmptyString, isNonNil, isRecord } from '@shared/lib/type-guards';
 
 export namespace SafeLsTypes {
 	export type VersionedStorageValue<T> = {
@@ -12,10 +14,6 @@ export namespace SafeLsTypes {
 		version: number;
 		guard: SafeJsonTypes.TypeGuard<T>;
 	};
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function createEnvelopeGuard<T>(
@@ -36,7 +34,7 @@ function getLocalStorage(): Storage | null {
 	}
 
 	try {
-		return window.localStorage ?? null;
+		return browser.getWindow()?.localStorage ?? null;
 	} catch {
 		return null;
 	}
@@ -44,7 +42,7 @@ function getLocalStorage(): Storage | null {
 
 function get<T>(definition: SafeLsTypes.Key<T>): T | null {
 	const storage = getLocalStorage();
-	if (!storage) {
+	if (!isNonNil(storage)) {
 		return null;
 	}
 
@@ -55,12 +53,12 @@ function get<T>(definition: SafeLsTypes.Key<T>): T | null {
 		return null;
 	}
 
-	if (!raw) {
+	if (!isNonEmptyString(raw)) {
 		return null;
 	}
 
 	const envelope = safeJson.parse(raw, createEnvelopeGuard(definition));
-	if (!envelope) {
+	if (!isNonNil(envelope)) {
 		remove(definition);
 		return null;
 	}
@@ -70,7 +68,7 @@ function get<T>(definition: SafeLsTypes.Key<T>): T | null {
 
 function set<T>(definition: SafeLsTypes.Key<T>, data: T): void {
 	const storage = getLocalStorage();
-	if (!storage) {
+	if (!isNonNil(storage)) {
 		return;
 	}
 
@@ -79,7 +77,7 @@ function set<T>(definition: SafeLsTypes.Key<T>, data: T): void {
 		data,
 	} satisfies SafeLsTypes.VersionedStorageValue<T>);
 
-	if (!serialized) {
+	if (!isNonEmptyString(serialized)) {
 		return;
 	}
 
@@ -92,7 +90,7 @@ function set<T>(definition: SafeLsTypes.Key<T>, data: T): void {
 
 function remove<T>(definition: SafeLsTypes.Key<T>): void {
 	const storage = getLocalStorage();
-	if (!storage) {
+	if (!isNonNil(storage)) {
 		return;
 	}
 

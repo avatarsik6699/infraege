@@ -1,9 +1,9 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
 import { useRegisterMutation } from '@shared/api/auth';
+import { useRouter } from '@shared/hooks/use-router';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
@@ -11,7 +11,7 @@ import { Label } from '@shared/ui/label';
 export function RegisterForm() {
 	const { t } = useTranslation('common');
 	const { t: tErrors } = useTranslation('errors');
-	const navigate = useNavigate();
+	const router = useRouter();
 	const registerMutation = useRegisterMutation();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -26,7 +26,7 @@ export function RegisterForm() {
 		}
 		setBlocked(false);
 		await registerMutation.mutateAsync({ email, password, consent_152fz: true });
-		navigate('/dashboard', { replace: true });
+		router.navigate('/dashboard', { replace: true });
 	};
 
 	return (

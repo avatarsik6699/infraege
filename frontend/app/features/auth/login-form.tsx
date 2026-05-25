@@ -1,9 +1,9 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
 import { useLoginMutation } from '@shared/api/auth';
+import { useRouter } from '@shared/hooks/use-router';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
@@ -14,7 +14,7 @@ export const DEFAULT_LOGIN_PASSWORD = 'changeme123';
 export function LoginForm() {
 	const { t: tCommon } = useTranslation('common');
 	const { t: tErrors } = useTranslation('errors');
-	const navigate = useNavigate();
+	const router = useRouter();
 	const loginMutation = useLoginMutation();
 	const [email, setEmail] = useState(DEFAULT_LOGIN_EMAIL);
 	const [password, setPassword] = useState(DEFAULT_LOGIN_PASSWORD);
@@ -22,7 +22,7 @@ export function LoginForm() {
 	const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
 		event.preventDefault();
 		await loginMutation.mutateAsync({ email, password });
-		navigate('/dashboard', { replace: true });
+		router.navigate('/dashboard', { replace: true });
 	};
 
 	return (

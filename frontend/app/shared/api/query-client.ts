@@ -2,6 +2,7 @@ import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
 
 import { ApiError } from '@shared/api/client';
 import { globalErrorNotifier } from '@shared/lib/global-error-notifier';
+import { logger } from '@shared/lib/logger';
 import { jwtService } from '@shared/services/jwt-service';
 
 const QUERY_STALE_TIME_MS = 1000 * 60 * 5;
@@ -17,7 +18,7 @@ export function createQueryClient(): QueryClient {
 					return;
 				}
 
-				console.debug('Query error captured', error);
+				logger.debug('Query error captured', { error });
 			},
 		}),
 		mutationCache: new MutationCache({

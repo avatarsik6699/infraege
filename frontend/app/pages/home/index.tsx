@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
+import { AppLink } from '@shared/ui/app-link';
 import { Button } from '@shared/ui/button';
 
 export default function HomePage() {
@@ -14,10 +14,10 @@ export default function HomePage() {
 			</header>
 			<div className='flex flex-wrap gap-3'>
 				<Button asChild>
-					<Link to='/login'>{t('auth.cta.signIn')}</Link>
+					<AppLink to='/login'>{t('auth.cta.signIn')}</AppLink>
 				</Button>
 				<Button asChild variant='outline'>
-					<Link to='/register'>{t('auth.cta.register')}</Link>
+					<AppLink to='/register'>{t('auth.cta.register')}</AppLink>
 				</Button>
 			</div>
 		</main>

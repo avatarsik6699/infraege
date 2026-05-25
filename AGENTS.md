@@ -18,6 +18,13 @@ Do not read `import.meta.env` directly outside `frontend/app/shared/config/env.t
 and `frontend/app/shared/config/runtime.ts`. Public frontend settings must flow
 through those helpers.
 
+Prefer explicit type-safe checks over implicit truthy/falsy conditions. Use
+guards from `frontend/app/shared/lib/type-guards.ts` (`isNil`, `isNull`,
+`isUndefined`, `isNonNil`, `isNumber`, `isString`, `isNonEmptyString`,
+`isBoolean`, `isRecord`, `isArrayOf`) or explicit comparisons. Project-wide
+type utilities belong in `frontend/app/shared/types/types.ts`: reusable helpers
+under `Utils`, domain-neutral global types under `GlobalTypes`.
+
 Required production frontend env vars:
 
 - `VITE_API_BASE_URL`
