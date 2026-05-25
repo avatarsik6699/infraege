@@ -23,6 +23,8 @@ services:
     build:
       args:
         VITE_API_BASE_URL: ${API_BASE_URL:?API_BASE_URL is required for production frontend builds}
+        VITE_PUBLIC_SITE_URL: ${VITE_PUBLIC_SITE_URL:?VITE_PUBLIC_SITE_URL is required for production frontend builds}
+        VITE_PUBLIC_APP_NAME: ${VITE_PUBLIC_APP_NAME:-Template App}
     environment:
       APP_ENV: production
 

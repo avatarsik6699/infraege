@@ -1,6 +1,8 @@
 export namespace EnvTypes {
 	export type Client = {
 		apiBaseUrl: string;
+		appName: string;
+		siteUrl: string;
 	};
 
 	export type Server = {
@@ -10,6 +12,8 @@ export namespace EnvTypes {
 
 type ClientEnvSchema = {
 	VITE_API_BASE_URL: string;
+	VITE_PUBLIC_APP_NAME: string;
+	VITE_PUBLIC_SITE_URL: string;
 };
 
 type ServerEnvSchema = {
@@ -24,8 +28,16 @@ function readClientEnv(): ClientEnvSchema {
 		throw new Error('VITE_API_BASE_URL is required for production builds');
 	}
 
+	const fallbackSiteUrl = 'http://localhost:3000';
+	const configuredSiteUrl = import.meta.env.VITE_PUBLIC_SITE_URL?.trim();
+	if (import.meta.env.PROD && !configuredSiteUrl) {
+		throw new Error('VITE_PUBLIC_SITE_URL is required for production builds');
+	}
+
 	return {
 		VITE_API_BASE_URL: configuredApiBaseUrl || fallbackApiBaseUrl,
+		VITE_PUBLIC_APP_NAME: import.meta.env.VITE_PUBLIC_APP_NAME?.trim() || 'Template App',
+		VITE_PUBLIC_SITE_URL: configuredSiteUrl || fallbackSiteUrl,
 	};
 }
 
@@ -48,6 +60,18 @@ export function normalizeApiBaseUrl(value: string): string {
 	}
 }
 
+export function normalizeSiteUrl(value: string): string {
+	try {
+		const url = new URL(value);
+		url.hash = '';
+		url.search = '';
+		url.pathname = url.pathname.replace(/\/+$/, '');
+		return url.toString().replace(/\/$/, '');
+	} catch {
+		throw new Error(`Invalid site URL value: ${value}`);
+	}
+}
+
 function readClientApiBaseUrl(): string {
 	const clientEnv = readClientEnv();
 
@@ -64,6 +88,8 @@ function readServerApiBaseUrl(): string {
 
 const client: EnvTypes.Client = {
 	apiBaseUrl: readClientApiBaseUrl(),
+	appName: readClientEnv().VITE_PUBLIC_APP_NAME,
+	siteUrl: normalizeSiteUrl(readClientEnv().VITE_PUBLIC_SITE_URL),
 };
 
 const server: EnvTypes.Server = {

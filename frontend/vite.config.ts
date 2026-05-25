@@ -3,21 +3,86 @@ import { fileURLToPath, URL } from 'node:url';
 import { reactRouter } from '@react-router/dev/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
-	plugins: [reactRouter(), tailwindcss()],
-	resolve: {
-		alias: {
-			'@': fileURLToPath(new URL('./app', import.meta.url)),
-			'@shared': fileURLToPath(new URL('./app/shared', import.meta.url)),
-			'@entities': fileURLToPath(new URL('./app/entities', import.meta.url)),
-			'@features': fileURLToPath(new URL('./app/features', import.meta.url)),
-			'@widgets': fileURLToPath(new URL('./app/widgets', import.meta.url)),
-			'@pages': fileURLToPath(new URL('./app/pages', import.meta.url)),
+function readPublicAppName(): string {
+	return process.env.VITE_PUBLIC_APP_NAME?.trim() || 'Template App';
+}
+
+function readPublicSiteUrl(command: string, mode: string): string {
+	const value = process.env.VITE_PUBLIC_SITE_URL?.trim();
+	if (command === 'build' && mode === 'production' && !value) {
+		throw new Error('VITE_PUBLIC_SITE_URL is required for production builds');
+	}
+
+	return value || 'http://localhost:3000';
+}
+
+export default defineConfig(({ command, mode }) => {
+	const appName = readPublicAppName();
+	readPublicSiteUrl(command, mode);
+
+	return {
+		plugins: [
+			reactRouter(),
+			tailwindcss(),
+			VitePWA({
+				registerType: 'autoUpdate',
+				injectRegister: null,
+				includeAssets: ['favicon.svg', 'pwa-icon.svg', 'pwa-maskable-icon.svg'],
+				manifest: {
+					name: appName,
+					short_name: appName,
+					description: 'Reusable FastAPI + React Router SSR template.',
+					theme_color: '#ffffff',
+					background_color: '#ffffff',
+					display: 'standalone',
+					scope: '/',
+					start_url: '/',
+					icons: [
+						{
+							src: '/pwa-icon.svg',
+							sizes: 'any',
+							type: 'image/svg+xml',
+							purpose: 'any',
+						},
+						{
+							src: '/pwa-maskable-icon.svg',
+							sizes: 'any',
+							type: 'image/svg+xml',
+							purpose: 'maskable',
+						},
+					],
+				},
+				workbox: {
+					cleanupOutdatedCaches: true,
+					globPatterns: ['assets/**/*.{js,css,woff,woff2}', '*.{svg,ico,png,webmanifest}'],
+					globIgnores: [
+						'**/*.html',
+						'sw.js',
+						'workbox-*.js',
+						'assets/auth-*.js',
+						'assets/login-*.js',
+						'assets/register-*.js',
+						'assets/dashboard-*.js',
+					],
+					navigateFallbackDenylist: [/^\/api\//, /^\/login\/?$/, /^\/register\/?$/, /^\/dashboard\/?$/, /.*/],
+				},
+			}),
+		],
+		resolve: {
+			alias: {
+				'@': fileURLToPath(new URL('./app', import.meta.url)),
+				'@shared': fileURLToPath(new URL('./app/shared', import.meta.url)),
+				'@entities': fileURLToPath(new URL('./app/entities', import.meta.url)),
+				'@features': fileURLToPath(new URL('./app/features', import.meta.url)),
+				'@widgets': fileURLToPath(new URL('./app/widgets', import.meta.url)),
+				'@pages': fileURLToPath(new URL('./app/pages', import.meta.url)),
+			},
 		},
-	},
-	server: {
-		port: 3000,
-		host: '0.0.0.0',
-	},
+		server: {
+			port: 3000,
+			host: '0.0.0.0',
+		},
+	};
 });

@@ -34,9 +34,13 @@ uv run pytest tests/ -v
 ```bash
 cd frontend
 pnpm install
+pnpm lint
 pnpm typecheck
 pnpm test
-VITE_API_BASE_URL=http://localhost:8000 pnpm build
+VITE_API_BASE_URL=http://localhost:8000 \
+VITE_PUBLIC_SITE_URL=http://localhost:3000 \
+VITE_PUBLIC_APP_NAME="Template App" \
+pnpm build:ci
 ```
 
 ## API type sync
@@ -82,6 +86,91 @@ deterministic, stable implementation output.
 - Do not read `import.meta.env` directly outside `@shared/config/env` and `@shared/config/runtime`.
 - Do not inline date formatting in components. Use `@shared/lib/date`.
 
+## Frontend SEO, SSR, and PWA contract
+
+The frontend is a React Router SSR application. SSR is enabled in
+`frontend/react-router.config.ts`, and production runs through
+`react-router-serve`. Keep this model unless the deployment architecture is
+explicitly changed.
+
+### Public environment
+
+Production frontend builds require a canonical public site URL:
+
+```env
+VITE_API_BASE_URL=https://example.com
+VITE_PUBLIC_SITE_URL=https://example.com
+VITE_PUBLIC_APP_NAME=Template App
+```
+
+`VITE_PUBLIC_SITE_URL` is used for canonical URLs, `robots.txt`, and
+`sitemap.xml`. Do not hard-code production origins in route files.
+
+### Route metadata
+
+Every route should use `buildRouteMeta` from `frontend/app/shared/lib/seo.ts`.
+
+```ts
+export function meta() {
+	return buildRouteMeta({
+		pathname: '/pricing',
+		title: 'Pricing',
+		description: 'Pricing plans for Template App.',
+		profile: 'publicIndexable',
+	});
+}
+```
+
+Use `publicIndexable` only for pages that should appear in search results. Use
+`privateNoIndex` for auth, dashboard, account, admin, and user-specific pages.
+The current `/login`, `/register`, and `/dashboard` routes are intentionally
+`noindex,nofollow`.
+
+### Sitemap and robots
+
+The sitemap is an explicit allowlist, not an automatic dump of all routes. When
+adding a public indexable route, add it to:
+
+- `frontend/app/shared/lib/seo.ts`
+- `frontend/scripts/site-config.mjs`
+
+Then regenerate:
+
+```bash
+cd frontend
+pnpm generate:sitemap
+pnpm check:seo
+```
+
+Private routes must never be added to the sitemap.
+
+### PWA behavior
+
+The template uses a conservative PWA setup through `vite-plugin-pwa`.
+
+- The app is installable through `manifest.webmanifest`.
+- The service worker registers only in production.
+- Static assets and icons are precached.
+- API responses, auth pages, dashboard pages, and SSR HTML navigations are not
+  treated as offline-first resources.
+
+If you add new private route chunks, update `globIgnores` in
+`frontend/vite.config.ts` and extend `frontend/scripts/check-pwa.mjs`.
+
+### i18n SEO note
+
+The current language switcher updates `<html lang>`, but language is not encoded
+in the URL. Do not add `hreflang` under this model. If the product needs
+multilingual SEO, redesign routing around locale URLs such as `/en/...` and
+`/ru/...` in a separate phase.
+
+### Production headers
+
+Nginx sets production edge headers, including HSTS, `Referrer-Policy`,
+`Permissions-Policy`, and CSP in report-only mode. Keep CSP report-only until
+third-party scripts, analytics, error tracking, fonts, images, and hydration are
+tested against a blocking policy.
+
 ## Backend conventions
 
 - Use `datetime.now(UTC)`, never naive `datetime.now()`.
@@ -107,9 +196,11 @@ Generate a production `.env` and replace nginx domain placeholders:
 ./scripts/setup-prod.sh my-project example.com
 ```
 
-Production frontend builds require an explicit public API base URL:
+Production frontend builds require explicit public frontend URLs:
 
 ```bash
 API_BASE_URL=https://example.com \
+VITE_PUBLIC_SITE_URL=https://example.com \
+VITE_PUBLIC_APP_NAME="Template App" \
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```

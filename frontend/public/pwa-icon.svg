@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Template App">
+	<rect width="512" height="512" rx="96" fill="#111827"/>
+	<path d="M128 132h256v72h-92v176h-72V204h-92z" fill="#ffffff"/>
+	<circle cx="326" cy="326" r="54" fill="#38bdf8"/>
+</svg>
