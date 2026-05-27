@@ -73,6 +73,7 @@ Desktop.ini
 pgdata/
 postgres-data/
 var/backup-status/
+var/nginx-logs/
 
 # Project-local
 TODO.md

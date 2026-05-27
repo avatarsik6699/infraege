@@ -1,0 +1,10 @@
+[Unit]
+Description=Template App restic backup
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=deploy
+WorkingDirectory=/opt/template-app
+ExecStart=/opt/template-app/scripts/backup.sh

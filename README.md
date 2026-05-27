@@ -245,3 +245,16 @@ off-site storage are documented in
 
 Optional uptime checks and alerting through Gatus are documented in
 [`docs/production-monitoring.md`](docs/production-monitoring.md).
+
+Minimal production security and incident handling are documented in
+[`docs/production-security.md`](docs/production-security.md) and
+[`docs/production-runbook.md`](docs/production-runbook.md).
+
+The current production ops status and next-step roadmap are tracked in
+[`docs/production-ops-roadmap.md`](docs/production-ops-roadmap.md).
+
+Ops checks that do not require production secrets:
+
+```bash
+make ops-check
+```

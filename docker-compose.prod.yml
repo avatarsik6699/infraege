@@ -39,6 +39,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./var/nginx-logs:/var/log/nginx
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - certbot-www:/var/www/certbot:ro
     command: ["nginx", "-g", "daemon off;"]

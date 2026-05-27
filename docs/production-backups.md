@@ -7,7 +7,7 @@ This project keeps the first production safety layer intentionally small:
 - `scripts/restore-check.sh` verifies that the latest PostgreSQL dump can be restored into a temporary database.
 - `scripts/check-backup-freshness.sh` verifies that a successful backup marker is still fresh.
 
-The default storage target is a local restic repository on the VPS. Off-site S3-compatible storage can be enabled later without changing the scripts.
+The default storage target is a local restic repository on the VPS. Treat this as a pre-production default only. Commercial production should use S3-compatible off-site storage before users or paid data depend on the system.
 
 ## What Each Part Does
 
@@ -66,6 +66,15 @@ RESTIC_PASSWORD_FILE=/etc/my-project/restic-password
 ```
 
 Keep `RESTIC_PASSWORD_FILE` outside git and set permissions to `600`. Losing this password means losing access to the backups.
+
+For commercial production, prefer an S3-compatible repository:
+
+```env
+RESTIC_REPOSITORY=s3:https://storage.yandexcloud.net/my-backup-bucket/my-project/restic
+AWS_ACCESS_KEY_ID=replace_me
+AWS_SECRET_ACCESS_KEY=replace_me
+AWS_DEFAULT_REGION=ru-central1
+```
 
 ### Retention
 
@@ -380,7 +389,9 @@ For schema changes, prefer staged migrations: first stop using a column/table in
 
 ## systemd Timer
 
-Create `/etc/systemd/system/my-project-backup.service`:
+Reusable templates live in `ops/systemd/`. Copy them to `/etc/systemd/system/` and replace `template-app` paths/names with the production project slug and directory.
+
+Create `/etc/systemd/system/my-project-backup.service` from `ops/systemd/template-app-backup.service`:
 
 ```ini
 [Unit]
@@ -426,6 +437,28 @@ cd /opt/my-project
 ./scripts/check-backup-freshness.sh
 ```
 
+Schedule the monthly restore drill and restic integrity check from:
+
+- `ops/systemd/template-app-restore-check.service`
+- `ops/systemd/template-app-restore-check.timer`
+- `ops/systemd/template-app-restic-check.service`
+- `ops/systemd/template-app-restic-check.timer`
+
+Enable them after the first successful manual backup and restore check:
+
+```bash
+sudo systemctl enable --now my-project-restore-check.timer
+sudo systemctl enable --now my-project-restic-check.timer
+sudo systemctl start my-project-restore-check.service
+sudo systemctl start my-project-restic-check.service
+```
+
+The manual integrity command is:
+
+```bash
+restic --repo "$RESTIC_REPOSITORY" --password-file "$RESTIC_PASSWORD_FILE" check
+```
+
 ## S3-Compatible Off-Site Storage
 
 Local backups protect against application mistakes, but not against VPS loss. To move the same scripts to S3-compatible storage, change only environment and credentials.
@@ -461,14 +494,24 @@ Prefer storing AWS credentials in `.env.backup` or a root-owned environment file
 - Set `BACKUP_REDIS=true` only when Redis contains data that cannot be recreated from PostgreSQL.
 - Add upload/media Docker volumes to `BACKUP_VOLUMES` as soon as the application stores user files.
 - Increase retention when the project has paying users or long support windows.
-- Move `RESTIC_REPOSITORY` to S3-compatible storage before relying on the app commercially.
+- Move `RESTIC_REPOSITORY` to S3-compatible off-site storage before relying on the app commercially.
 - Schedule restore drills monthly and after every backup script change.
+
+## Monthly Restore Drill Checklist
+
+- Run `./scripts/backup.sh` and confirm a fresh restic snapshot exists.
+- Run `./scripts/restore-check.sh`; it must restore into a temporary database and drop it.
+- Run `restic --repo "$RESTIC_REPOSITORY" --password-file "$RESTIC_PASSWORD_FILE" check`.
+- Run `./scripts/check-backup-freshness.sh` and confirm `status:"ok"`.
+- Confirm Gatus backup freshness check is green when a backup config is selected.
+- Record the date, snapshot ID, and result in the project operations notes.
 
 ## Acceptance Checklist
 
 - `bash -n scripts/backup.sh` passes.
 - `bash -n scripts/restore-check.sh` passes.
-- `docker compose -f docker-compose.yml -f docker-compose.prod.yml config` renders successfully.
+- `API_BASE_URL=http://localhost:8000 VITE_PUBLIC_SITE_URL=http://localhost:3000 docker compose --env-file .env.example -f docker-compose.yml -f docker-compose.prod.yml config` renders successfully.
 - `./scripts/backup.sh` creates a restic snapshot.
 - `./scripts/restore-check.sh` restores the latest PostgreSQL dump into a temporary database.
+- `restic --repo "$RESTIC_REPOSITORY" --password-file "$RESTIC_PASSWORD_FILE" check` passes.
 - `docker inspect` shows `LogConfig` with `max-size=10m` and `max-file=5` after containers are recreated.

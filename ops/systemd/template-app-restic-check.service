@@ -1,0 +1,11 @@
+[Unit]
+Description=Template App restic repository integrity check
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=deploy
+WorkingDirectory=/opt/template-app
+EnvironmentFile=/opt/template-app/.env.backup
+ExecStart=/usr/bin/restic --repo ${RESTIC_REPOSITORY} --password-file ${RESTIC_PASSWORD_FILE} check

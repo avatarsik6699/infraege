@@ -15,7 +15,7 @@ It intentionally does not add metrics storage, tracing, log aggregation, analyti
 
 ## Health Endpoints
 
-The backend exposes three health endpoints:
+The backend exposes four health endpoints:
 
 - `/api/v1/health/live`: FastAPI process is alive, no dependency checks.
 - `/api/v1/health`: public health check, includes PostgreSQL connectivity.
@@ -94,7 +94,7 @@ Run one successful backup and confirm freshness:
 ./scripts/check-backup-freshness.sh
 ```
 
-Then select a Gatus config with backup checks:
+Then select a Gatus config with backup checks. This is the recommended production mode after the first successful backup:
 
 ```env
 GATUS_CONFIG_PATH=/config/config.backup.yaml
@@ -114,6 +114,34 @@ docker compose \
 ```
 
 This check proves that the last successful backup is recent. It does not prove that the whole VPS is reachable from the internet. Keep an external uptime monitor for `https://yourdomain.com/` and `/api/v1/health`.
+
+## Secure Gatus Access
+
+The default access model is an SSH tunnel:
+
+```bash
+ssh -L 8080:127.0.0.1:8080 deploy@your-vps
+```
+
+If the status dashboard must be reachable through a browser without SSH, use `ops/nginx/gatus-basic-auth.conf` as an opt-in host-level Nginx template. Before enabling it:
+
+- replace `status.example.com` and certificate paths;
+- create `/etc/nginx/.htpasswd_monitoring` with `htpasswd`;
+- keep `GATUS_BIND_ADDRESS=127.0.0.1`;
+- run `sudo nginx -t && sudo systemctl reload nginx`.
+
+Do not expose Gatus directly with `GATUS_BIND_ADDRESS=0.0.0.0` unless another trusted edge layer enforces authentication and rate limits.
+
+## External Monitoring
+
+Local Gatus cannot alert if the whole VPS or network is down. Add at least two external checks in UptimeRobot, HetrixTools, or another provider that can reach the public internet:
+
+| Check | Target | Expected result |
+|---|---|---|
+| Website | `https://yourdomain.com/` | HTTP 200 within 5 minutes |
+| API health | `https://yourdomain.com/api/v1/health` | HTTP 200 and body `status=ok` |
+
+Use Telegram/email alerts from the external provider. Keep the local Gatus alerts as the detailed signal and the external provider as the independent signal.
 
 To enable direct Telegram alerts, edit `.env.monitoring`:
 
@@ -207,6 +235,7 @@ Gatus YAML files live under `ops/gatus/`. The `ops/` directory is included in th
 ## When To Use Each Mode
 
 - Use `config.yaml` while validating checks and UI.
+- Use `config.backup.yaml` as the dashboard-only production default after the first successful backup.
 - Use `config.telegram.yaml` if the VPS can reach Telegram directly or through a proxy.
 - Use `config.custom.yaml` if Telegram needs VPN-specific handling or you want multiple alert channels.
 

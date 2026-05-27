@@ -55,6 +55,11 @@ cat > "${BACKUP_ENV_FILE}" <<EOF
 # Then write a strong password into it. Do not commit the password file.
 RESTIC_REPOSITORY=/var/backups/${PROJECT_SLUG}/restic
 RESTIC_PASSWORD_FILE=/etc/${PROJECT_SLUG}/restic-password
+# Commercial production should use S3-compatible off-site storage, for example:
+# RESTIC_REPOSITORY=s3:https://storage.yandexcloud.net/your-backup-bucket/${PROJECT_SLUG}/restic
+# AWS_ACCESS_KEY_ID=
+# AWS_SECRET_ACCESS_KEY=
+# AWS_DEFAULT_REGION=ru-central1
 BACKUP_REDIS=false
 BACKUP_VOLUMES=
 BACKUP_STATUS_DIR=var/backup-status

@@ -1,0 +1,6 @@
+# Copy to /etc/sshguard/sshguard.conf and adjust whitelist entries before enabling.
+BACKEND="/usr/lib/sshguard/sshg-fw-iptables"
+THRESHOLD=30
+BLOCK_TIME=3600
+DETECTION_TIME=1800
+WHITELIST_FILE=/etc/sshguard/whitelist
