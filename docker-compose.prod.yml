@@ -18,6 +18,11 @@ services:
   backend:
     environment:
       APP_ENV: production
+      BACKUP_HEALTH_ENABLED: ${BACKUP_HEALTH_ENABLED:-false}
+      BACKUP_HEALTH_STATUS_FILE: /run/app-backup/last-success.json
+      BACKUP_MAX_AGE_HOURS: ${BACKUP_MAX_AGE_HOURS:-36}
+    volumes:
+      - ./var/backup-status:/run/app-backup:ro
 
   frontend:
     build:

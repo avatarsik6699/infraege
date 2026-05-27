@@ -5,6 +5,7 @@ This project keeps the first production safety layer intentionally small:
 - Docker log rotation prevents container logs from filling the VPS disk.
 - `scripts/backup.sh` creates application data backups and stores them in restic.
 - `scripts/restore-check.sh` verifies that the latest PostgreSQL dump can be restored into a temporary database.
+- `scripts/check-backup-freshness.sh` verifies that a successful backup marker is still fresh.
 
 The default storage target is a local restic repository on the VPS. Off-site S3-compatible storage can be enabled later without changing the scripts.
 
@@ -25,10 +26,13 @@ Each long-running service keeps at most five 10 MB log files. This preserves `do
 
 `scripts/backup.sh` runs `pg_dump -Fc` inside the `db` service. The custom dump format is compact, supports `pg_restore`, and is the safest default for restore drills.
 
-The script reads these values from `.env`:
+The script reads app values from `.env`:
 
 - `POSTGRES_USER`
 - `POSTGRES_DB`
+
+It reads backup values from `.env.backup`:
+
 - `RESTIC_REPOSITORY`
 - `RESTIC_PASSWORD_FILE`
 
@@ -75,9 +79,31 @@ RESTIC_KEEP_MONTHLY=6
 
 Tune these values per project based on data size, risk, and available storage.
 
+### Backup freshness marker
+
+After `restic backup` and retention both complete successfully, `scripts/backup.sh` writes:
+
+```text
+var/backup-status/last-success.json
+```
+
+The marker contains the success timestamp, PostgreSQL database name, hostname, restic repository, and the configured freshness window. It is runtime state and is ignored by git.
+
+Freshness settings live in `.env.backup`:
+
+```env
+BACKUP_STATUS_DIR=var/backup-status
+BACKUP_MAX_AGE_HOURS=36
+BACKUP_HEARTBEAT_URL=
+```
+
+`BACKUP_MAX_AGE_HOURS=36` fits a daily backup schedule with room for timer delay. If the project runs backups every 12 hours, reduce it. If backups run weekly, increase it intentionally.
+
+If `BACKUP_HEARTBEAT_URL` is set, the backup script calls it only after the backup, retention, and marker write have succeeded. A failed heartbeat request makes the script fail, so systemd logs show the problem.
+
 ## First-Time VPS Setup
 
-Run these commands on the VPS after `scripts/setup-prod.sh` has generated `.env`.
+Run these commands on the VPS after `scripts/setup-prod.sh` has generated `.env` and `.env.backup`.
 
 ```bash
 cd /opt/my-project
@@ -92,8 +118,8 @@ openssl rand -base64 48 | sudo tee /etc/my-project/restic-password >/dev/null
 sudo chown deploy:deploy /etc/my-project/restic-password
 sudo chmod 600 /etc/my-project/restic-password
 
-export RESTIC_REPOSITORY="$(sed -n 's/^RESTIC_REPOSITORY=//p' .env | tail -n 1)"
-export RESTIC_PASSWORD_FILE="$(sed -n 's/^RESTIC_PASSWORD_FILE=//p' .env | tail -n 1)"
+export RESTIC_REPOSITORY="$(sed -n 's/^RESTIC_REPOSITORY=//p' .env.backup | tail -n 1)"
+export RESTIC_PASSWORD_FILE="$(sed -n 's/^RESTIC_PASSWORD_FILE=//p' .env.backup | tail -n 1)"
 restic --repo "$RESTIC_REPOSITORY" --password-file "$RESTIC_PASSWORD_FILE" init
 ```
 
@@ -104,8 +130,8 @@ Replace `my-project` with the project slug used for `scripts/setup-prod.sh`.
 ```bash
 cd /opt/my-project
 ./scripts/backup.sh
-export RESTIC_REPOSITORY="$(sed -n 's/^RESTIC_REPOSITORY=//p' .env | tail -n 1)"
-export RESTIC_PASSWORD_FILE="$(sed -n 's/^RESTIC_PASSWORD_FILE=//p' .env | tail -n 1)"
+export RESTIC_REPOSITORY="$(sed -n 's/^RESTIC_REPOSITORY=//p' .env.backup | tail -n 1)"
+export RESTIC_PASSWORD_FILE="$(sed -n 's/^RESTIC_PASSWORD_FILE=//p' .env.backup | tail -n 1)"
 restic --repo "$RESTIC_REPOSITORY" --password-file "$RESTIC_PASSWORD_FILE" snapshots
 ```
 
@@ -122,6 +148,31 @@ cd /opt/my-project
 
 The restore check never restores over production data. It restores the latest restic snapshot into a temporary directory, creates a temporary database, runs `pg_restore`, and drops the temporary database.
 
+## Backup Freshness Check
+
+Run this after the first successful backup:
+
+```bash
+cd /opt/my-project
+./scripts/check-backup-freshness.sh
+```
+
+A fresh marker returns exit code `0` and compact JSON:
+
+```json
+{"status":"ok","reason":"backup marker is fresh","age_hours":0,"max_age_hours":36}
+```
+
+Missing, invalid, future-dated, or stale markers return non-zero and `status:"degraded"`. Use this for manual checks and incident triage; use Gatus for continuous alerting.
+
+To expose freshness to local monitoring, add this to `.env` and recreate the backend:
+
+```env
+BACKUP_HEALTH_ENABLED=true
+```
+
+The backend reads the marker from `/run/app-backup/last-success.json`, which production compose mounts from `./var/backup-status`. It does not need restic credentials.
+
 ## Real Restore Runbook
 
 Use this section when data must actually be recovered. Prefer restoring into a temporary database first unless the production database is completely lost or intentionally being rolled back.
@@ -132,8 +183,8 @@ Run these commands from the project directory:
 
 ```bash
 cd /opt/my-project
-export RESTIC_REPOSITORY="$(sed -n 's/^RESTIC_REPOSITORY=//p' .env | tail -n 1)"
-export RESTIC_PASSWORD_FILE="$(sed -n 's/^RESTIC_PASSWORD_FILE=//p' .env | tail -n 1)"
+export RESTIC_REPOSITORY="$(sed -n 's/^RESTIC_REPOSITORY=//p' .env.backup | tail -n 1)"
+export RESTIC_PASSWORD_FILE="$(sed -n 's/^RESTIC_PASSWORD_FILE=//p' .env.backup | tail -n 1)"
 export POSTGRES_USER="$(sed -n 's/^POSTGRES_USER=//p' .env | tail -n 1)"
 export POSTGRES_DB="$(sed -n 's/^POSTGRES_DB=//p' .env | tail -n 1)"
 ```
@@ -294,6 +345,8 @@ Use this checklist before destructive migrations, bulk updates, manual SQL fixes
 3. Record the snapshot ID:
 
    ```bash
+   export RESTIC_REPOSITORY="$(sed -n 's/^RESTIC_REPOSITORY=//p' .env.backup | tail -n 1)"
+   export RESTIC_PASSWORD_FILE="$(sed -n 's/^RESTIC_PASSWORD_FILE=//p' .env.backup | tail -n 1)"
    restic --repo "$RESTIC_REPOSITORY" \
      --password-file "$RESTIC_PASSWORD_FILE" \
      snapshots
@@ -366,6 +419,13 @@ sudo systemctl status my-project-backup.service
 systemctl list-timers '*backup*'
 ```
 
+After the first timer run, verify the marker:
+
+```bash
+cd /opt/my-project
+./scripts/check-backup-freshness.sh
+```
+
 ## S3-Compatible Off-Site Storage
 
 Local backups protect against application mistakes, but not against VPS loss. To move the same scripts to S3-compatible storage, change only environment and credentials.
@@ -382,18 +442,18 @@ AWS_DEFAULT_REGION=ru-central1
 Initialize and verify:
 
 ```bash
-export RESTIC_REPOSITORY="$(sed -n 's/^RESTIC_REPOSITORY=//p' .env | tail -n 1)"
-export RESTIC_PASSWORD_FILE="$(sed -n 's/^RESTIC_PASSWORD_FILE=//p' .env | tail -n 1)"
-export AWS_ACCESS_KEY_ID="$(sed -n 's/^AWS_ACCESS_KEY_ID=//p' .env | tail -n 1)"
-export AWS_SECRET_ACCESS_KEY="$(sed -n 's/^AWS_SECRET_ACCESS_KEY=//p' .env | tail -n 1)"
-export AWS_DEFAULT_REGION="$(sed -n 's/^AWS_DEFAULT_REGION=//p' .env | tail -n 1)"
+export RESTIC_REPOSITORY="$(sed -n 's/^RESTIC_REPOSITORY=//p' .env.backup | tail -n 1)"
+export RESTIC_PASSWORD_FILE="$(sed -n 's/^RESTIC_PASSWORD_FILE=//p' .env.backup | tail -n 1)"
+export AWS_ACCESS_KEY_ID="$(sed -n 's/^AWS_ACCESS_KEY_ID=//p' .env.backup | tail -n 1)"
+export AWS_SECRET_ACCESS_KEY="$(sed -n 's/^AWS_SECRET_ACCESS_KEY=//p' .env.backup | tail -n 1)"
+export AWS_DEFAULT_REGION="$(sed -n 's/^AWS_DEFAULT_REGION=//p' .env.backup | tail -n 1)"
 restic --repo "$RESTIC_REPOSITORY" --password-file "$RESTIC_PASSWORD_FILE" init
 ./scripts/backup.sh
 restic --repo "$RESTIC_REPOSITORY" --password-file "$RESTIC_PASSWORD_FILE" snapshots
 ./scripts/restore-check.sh
 ```
 
-Prefer storing AWS credentials in a root-owned environment file loaded by the systemd service instead of committing them to `.env`.
+Prefer storing AWS credentials in `.env.backup` or a root-owned environment file loaded by the systemd service instead of committing them to `.env`.
 
 ## Adapting This Template for a Real Project
 

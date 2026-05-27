@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+!.env.backup.example
+!.env.monitoring.example
 *.pem
 *.key
 
@@ -70,6 +72,7 @@ Desktop.ini
 # Docker volumes / generated data
 pgdata/
 postgres-data/
+var/backup-status/
 
 # Project-local
 TODO.md

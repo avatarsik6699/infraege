@@ -1,0 +1,63 @@
+web:
+  port: ${GATUS_WEB_PORT}
+
+ui:
+  title: ${VITE_PUBLIC_APP_NAME} Health
+
+storage:
+  type: sqlite
+  path: /data/gatus.db
+
+endpoints:
+  - name: frontend-internal
+    group: internal
+    url: http://frontend:3000/
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+
+  - name: backend-live-internal
+    group: internal
+    url: http://backend:8000/api/v1/health/live
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+
+  - name: backend-detailed-internal
+    group: internal
+    url: http://backend:8000/api/v1/health/detailed
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+      - "[BODY].checks.db == ok"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+
+  - name: frontend-public
+    group: public
+    url: https://${DOMAIN}/
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+
+  - name: backend-health-public
+    group: public
+    url: https://${DOMAIN}/api/v1/health
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+
+  - name: backup-freshness-internal
+    group: operations
+    url: http://backend:8000/api/v1/health/backup
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"

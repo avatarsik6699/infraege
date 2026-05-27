@@ -1,0 +1,115 @@
+web:
+  port: ${GATUS_WEB_PORT}
+
+ui:
+  title: ${VITE_PUBLIC_APP_NAME} Health
+
+storage:
+  type: sqlite
+  path: /data/gatus.db
+
+alerting:
+  custom:
+    url: ${CUSTOM_ALERT_URL}
+    method: POST
+    headers:
+      Authorization: ${CUSTOM_ALERT_AUTHORIZATION}
+      Content-Type: application/json
+    body: |
+      {
+        "title": "[ALERT_TRIGGERED_OR_RESOLVED]: [ENDPOINT_NAME]",
+        "group": "[ENDPOINT_GROUP]",
+        "description": "[ALERT_DESCRIPTION]",
+        "condition_results": [CONDITION_RESULTS],
+        "errors": [ERRORS]
+      }
+
+endpoints:
+  - name: frontend-internal
+    group: internal
+    url: http://frontend:3000/
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+    alerts:
+      - type: custom
+        failure-threshold: ${GATUS_FAILURE_THRESHOLD}
+        success-threshold: ${GATUS_SUCCESS_THRESHOLD}
+        send-on-resolved: true
+        description: Frontend container health check failed
+
+  - name: backend-live-internal
+    group: internal
+    url: http://backend:8000/api/v1/health/live
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+    alerts:
+      - type: custom
+        failure-threshold: ${GATUS_FAILURE_THRESHOLD}
+        success-threshold: ${GATUS_SUCCESS_THRESHOLD}
+        send-on-resolved: true
+        description: Backend process liveness check failed
+
+  - name: backend-detailed-internal
+    group: internal
+    url: http://backend:8000/api/v1/health/detailed
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+      - "[BODY].checks.db == ok"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+    alerts:
+      - type: custom
+        failure-threshold: ${GATUS_FAILURE_THRESHOLD}
+        success-threshold: ${GATUS_SUCCESS_THRESHOLD}
+        send-on-resolved: true
+        description: Backend dependency health check failed
+
+  - name: frontend-public
+    group: public
+    url: https://${DOMAIN}/
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+    alerts:
+      - type: custom
+        failure-threshold: ${GATUS_FAILURE_THRESHOLD}
+        success-threshold: ${GATUS_SUCCESS_THRESHOLD}
+        send-on-resolved: true
+        description: Public frontend health check failed
+
+  - name: backend-health-public
+    group: public
+    url: https://${DOMAIN}/api/v1/health
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+    alerts:
+      - type: custom
+        failure-threshold: ${GATUS_FAILURE_THRESHOLD}
+        success-threshold: ${GATUS_SUCCESS_THRESHOLD}
+        send-on-resolved: true
+        description: Public backend health check failed
+
+  - name: backup-freshness-internal
+    group: operations
+    url: http://backend:8000/api/v1/health/backup
+    interval: ${GATUS_MONITOR_INTERVAL}
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
+    alerts:
+      - type: custom
+        failure-threshold: ${GATUS_FAILURE_THRESHOLD}
+        success-threshold: ${GATUS_SUCCESS_THRESHOLD}
+        send-on-resolved: true
+        description: Latest successful backup is missing or stale

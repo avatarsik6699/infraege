@@ -3,16 +3,19 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${ENV_FILE:-${PROJECT_ROOT}/.env}"
+BACKUP_ENV_FILE="${BACKUP_ENV_FILE:-${PROJECT_ROOT}/.env.backup}"
 TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+SUCCESS_TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 COMPOSE_FILES=(
   -f "${PROJECT_ROOT}/docker-compose.yml"
   -f "${PROJECT_ROOT}/docker-compose.prod.yml"
 )
 
-load_env() {
-  if [ ! -f "${ENV_FILE}" ]; then
-    echo "error: ${ENV_FILE} does not exist" >&2
+load_env_file() {
+  local env_file="$1"
+  if [ ! -f "${env_file}" ]; then
+    echo "error: ${env_file} does not exist" >&2
     exit 1
   fi
 
@@ -45,7 +48,7 @@ load_env() {
     fi
 
     export "${key}=${value}"
-  done < "${ENV_FILE}"
+  done < "${env_file}"
 }
 
 require_command() {
@@ -60,6 +63,25 @@ require_env() {
   if [ -z "${!name:-}" ]; then
     echo "error: ${name} is required" >&2
     exit 1
+  fi
+}
+
+json_escape() {
+  local value="$1"
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  value="${value//$'\n'/\\n}"
+  value="${value//$'\r'/\\r}"
+  value="${value//$'\t'/\\t}"
+  printf '%s' "${value}"
+}
+
+resolve_project_path() {
+  local path="$1"
+  if [ "${path#/}" != "${path}" ]; then
+    printf '%s\n' "${path}"
+  else
+    printf '%s\n' "${PROJECT_ROOT}/${path}"
   fi
 }
 
@@ -83,7 +105,8 @@ backup_docker_volume() {
     tar czf "/backup/$(basename "${archive}")" -C /data .
 }
 
-load_env
+load_env_file "${ENV_FILE}"
+load_env_file "${BACKUP_ENV_FILE}"
 require_command docker
 require_command restic
 require_env POSTGRES_USER
@@ -101,6 +124,15 @@ RESTIC_KEEP_WEEKLY="${RESTIC_KEEP_WEEKLY:-4}"
 RESTIC_KEEP_MONTHLY="${RESTIC_KEEP_MONTHLY:-6}"
 BACKUP_REDIS="${BACKUP_REDIS:-false}"
 BACKUP_VOLUMES="${BACKUP_VOLUMES:-}"
+BACKUP_STATUS_DIR="${BACKUP_STATUS_DIR:-var/backup-status}"
+BACKUP_STATUS_PATH="$(resolve_project_path "${BACKUP_STATUS_DIR}")"
+BACKUP_HEARTBEAT_URL="${BACKUP_HEARTBEAT_URL:-}"
+BACKUP_MAX_AGE_HOURS="${BACKUP_MAX_AGE_HOURS:-36}"
+
+if [[ ! "${BACKUP_MAX_AGE_HOURS}" =~ ^[0-9]+$ ]] || [ "${BACKUP_MAX_AGE_HOURS}" -lt 1 ]; then
+  echo "error: BACKUP_MAX_AGE_HOURS must be a positive integer" >&2
+  exit 1
+fi
 
 TEMP_DIR="$(mktemp -d)"
 trap 'rm -rf "${TEMP_DIR}"' EXIT
@@ -147,5 +179,16 @@ restic_cmd forget \
   --keep-weekly "${RESTIC_KEEP_WEEKLY}" \
   --keep-monthly "${RESTIC_KEEP_MONTHLY}" \
   --prune
+
+mkdir -p "${BACKUP_STATUS_PATH}"
+cat > "${BACKUP_STATUS_PATH}/last-success.json" <<EOF
+{"status":"ok","timestamp":"$(json_escape "${SUCCESS_TIMESTAMP}")","postgres_db":"$(json_escape "${POSTGRES_DB}")","hostname":"$(json_escape "$(hostname)")","restic_repository":"$(json_escape "${RESTIC_REPOSITORY}")","max_age_hours":${BACKUP_MAX_AGE_HOURS}}
+EOF
+
+if [ -n "${BACKUP_HEARTBEAT_URL}" ]; then
+  require_command curl
+  echo "[backup] sending backup heartbeat"
+  curl -fsS --max-time 20 "${BACKUP_HEARTBEAT_URL}" >/dev/null
+fi
 
 echo "[backup] completed successfully"

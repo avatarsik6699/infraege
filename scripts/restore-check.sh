@@ -3,6 +3,7 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${ENV_FILE:-${PROJECT_ROOT}/.env}"
+BACKUP_ENV_FILE="${BACKUP_ENV_FILE:-${PROJECT_ROOT}/.env.backup}"
 RESTORE_TARGET="$(mktemp -d)"
 RESTORE_DB_NAME="restore_check_$(date -u +%Y%m%d%H%M%S)"
 
@@ -22,9 +23,10 @@ cleanup() {
 }
 trap cleanup EXIT
 
-load_env() {
-  if [ ! -f "${ENV_FILE}" ]; then
-    echo "error: ${ENV_FILE} does not exist" >&2
+load_env_file() {
+  local env_file="$1"
+  if [ ! -f "${env_file}" ]; then
+    echo "error: ${env_file} does not exist" >&2
     exit 1
   fi
 
@@ -57,7 +59,7 @@ load_env() {
     fi
 
     export "${key}=${value}"
-  done < "${ENV_FILE}"
+  done < "${env_file}"
 }
 
 require_command() {
@@ -82,7 +84,8 @@ restic_cmd() {
     "$@"
 }
 
-load_env
+load_env_file "${ENV_FILE}"
+load_env_file "${BACKUP_ENV_FILE}"
 require_command docker
 require_command restic
 require_env POSTGRES_USER

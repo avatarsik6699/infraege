@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     API_BASE_URL: str = "http://localhost:8000"
     AUTH_RATE_LIMIT: str = "20/minute"
+    BACKUP_HEALTH_ENABLED: bool = False
+    BACKUP_HEALTH_STATUS_FILE: str = "/run/app-backup/last-success.json"
+    BACKUP_MAX_AGE_HOURS: int = 36
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod

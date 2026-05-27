@@ -197,11 +197,21 @@ uv run python scripts/seed.py --dry-run
 
 ## Production setup
 
-Generate a production `.env` and replace nginx domain placeholders:
+### Environment files
+
+Environment configuration is split by operational layer:
+
+- `.env` contains application runtime settings for backend, frontend, DB, Redis, and public URLs.
+- `.env.backup` contains restic backup, restore-check, and backup freshness settings.
+- `.env.monitoring` contains Gatus, alerting, and optional proxy/VPN settings.
+
+Generate production env files and replace nginx domain placeholders:
 
 ```bash
 ./scripts/setup-prod.sh my-project example.com
 ```
+
+This creates `.env`, `.env.backup`, and `.env.monitoring`.
 
 Production frontend builds require explicit public frontend URLs:
 
@@ -212,6 +222,26 @@ VITE_PUBLIC_APP_NAME="Template App" \
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
 
+Monitoring is started separately and reads app plus monitoring env files:
+
+```bash
+docker compose \
+  --env-file .env \
+  --env-file .env.monitoring \
+  -f docker-compose.monitoring.yml \
+  up -d
+```
+
+After the first successful backup, verify its freshness marker:
+
+```bash
+./scripts/backup.sh
+./scripts/check-backup-freshness.sh
+```
+
 Production backup setup, restore checks, Docker log rotation, and S3-compatible
 off-site storage are documented in
 [`docs/production-backups.md`](docs/production-backups.md).
+
+Optional uptime checks and alerting through Gatus are documented in
+[`docs/production-monitoring.md`](docs/production-monitoring.md).

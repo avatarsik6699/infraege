@@ -1,0 +1,43 @@
+x-json-file-logging: &json-file-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  gatus:
+    image: ghcr.io/twin/gatus:stable
+    restart: unless-stopped
+    logging: *json-file-logging
+    environment:
+      DOMAIN: ${DOMAIN}
+      VITE_PUBLIC_APP_NAME: ${VITE_PUBLIC_APP_NAME:-Template App}
+      GATUS_CONFIG_PATH: ${GATUS_CONFIG_PATH:-/config/config.yaml}
+      GATUS_WEB_PORT: ${GATUS_WEB_PORT:-8080}
+      GATUS_MONITOR_INTERVAL: ${GATUS_MONITOR_INTERVAL:-60s}
+      GATUS_RESPONSE_TIME_LIMIT: ${GATUS_RESPONSE_TIME_LIMIT:-1000}
+      GATUS_FAILURE_THRESHOLD: ${GATUS_FAILURE_THRESHOLD:-3}
+      GATUS_SUCCESS_THRESHOLD: ${GATUS_SUCCESS_THRESHOLD:-2}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      TELEGRAM_TOPIC_ID: ${TELEGRAM_TOPIC_ID:-}
+      CUSTOM_ALERT_URL: ${CUSTOM_ALERT_URL:-}
+      CUSTOM_ALERT_AUTHORIZATION: ${CUSTOM_ALERT_AUTHORIZATION:-}
+      HTTP_PROXY: ${GATUS_HTTP_PROXY:-}
+      HTTPS_PROXY: ${GATUS_HTTPS_PROXY:-}
+      NO_PROXY: ${GATUS_NO_PROXY:-backend,frontend,db,redis,localhost,127.0.0.1}
+    ports:
+      - "${GATUS_BIND_ADDRESS:-127.0.0.1}:${GATUS_WEB_PORT:-8080}:8080"
+    volumes:
+      - ./ops/gatus:/config:ro
+      - gatus-data:/data
+    networks:
+      - app
+
+networks:
+  app:
+    external: true
+    name: ${APP_DOCKER_NETWORK:-react-routerv7-fastapi_default}
+
+volumes:
+  gatus-data:
