@@ -211,3 +211,7 @@ VITE_PUBLIC_SITE_URL=https://example.com \
 VITE_PUBLIC_APP_NAME="Template App" \
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
+
+Production backup setup, restore checks, Docker log rotation, and S3-compatible
+off-site storage are documented in
+[`docs/production-backups.md`](docs/production-backups.md).

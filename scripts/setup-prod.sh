@@ -43,6 +43,19 @@ DOMAIN=${DOMAIN}
 API_BASE_URL=https://${DOMAIN}
 API_BASE_INTERNAL_URL=http://backend:8000
 VITE_API_BASE_URL=https://${DOMAIN}
+VITE_PUBLIC_SITE_URL=https://${DOMAIN}
+VITE_PUBLIC_APP_NAME=Template App
+
+# Production backups.
+# Create this file on the VPS with: sudo install -m 600 -o deploy -g deploy /dev/null /etc/${PROJECT_SLUG}/restic-password
+# Then write a strong password into it. Do not commit the password file.
+RESTIC_REPOSITORY=/var/backups/${PROJECT_SLUG}/restic
+RESTIC_PASSWORD_FILE=/etc/${PROJECT_SLUG}/restic-password
+BACKUP_REDIS=false
+BACKUP_VOLUMES=
+RESTIC_KEEP_DAILY=7
+RESTIC_KEEP_WEEKLY=4
+RESTIC_KEEP_MONTHLY=6
 EOF
 
 sed -i "s/\\[DOMAIN\\]/${DOMAIN}/g" "${NGINX_FILE}"

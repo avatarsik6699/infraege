@@ -61,6 +61,7 @@ include = [
     "/app",
     "/alembic",
     "/scripts",
+    "/docs",
     "/frontend",
     "/README.md",
     "/Makefile",
