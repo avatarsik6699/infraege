@@ -5,14 +5,14 @@
   },
 
   "captured_at": "2026-05-28",
-  "phase_completed": "02",
+  "phase_completed": "03",
   "phase_in_progress": null,
 
   "product": {
     "name": "infraege",
     "production_domain": "infraege.ru",
     "spec_version": "v2.1",
-    "status": "phase_02_complete"
+    "status": "phase_03_complete"
   },
 
   "stack": {
@@ -37,7 +37,12 @@
     "CodeBlock",
     "AssetManifestItem",
     "ContentTaskDocument",
-    "ContentValidationError"
+    "ContentValidationError",
+    "PublicTaskSummary",
+    "PublicTaskDetail",
+    "TheoryTocItem",
+    "PublicPracticePreview",
+    "CatalogFilters"
   ],
 
   "planned_contract": {
@@ -98,6 +103,18 @@
       "path": "/api/v1/public/auth/me",
       "auth": "user",
       "contract": "Current public user profile."
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/public/tasks",
+      "auth": "none",
+      "contract": "Published-only 27-task public catalog with optional search and difficulty filters; response excludes answer internals."
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/public/tasks/{slug}",
+      "auth": "none",
+      "contract": "Published-only public task theory detail with metadata, TOC, asset manifest, and practice CTA preview data; response excludes expected_value, answer patterns, validation results, and draft tasks."
     }
   ],
 
@@ -221,5 +238,5 @@
 
   "db_seeds": {},
 
-  "notes": "Phase 02 complete. Added task-first content persistence, repository Markdown/frontmatter source files, asset directories, validation/rendering/import tooling, and content CLI contracts."
+  "notes": "Phase 03 complete. Added published-only public task catalog/detail API contracts and Russian-first SSR public catalog/theory pages."
 }

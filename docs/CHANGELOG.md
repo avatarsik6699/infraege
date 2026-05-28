@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-05-28 — Phase 03 complete
+
+**Type**: phase-completion
+**Author**: AI (context-update)
+**Triggered by**: PHASE_03 gate passed
+
+### Changes
+- Added published-only public task catalog and task theory detail API endpoints.
+- Replaced placeholder public home, catalog, and theory routes with Russian-first SSR pages.
+- Added frontend task API helpers, query keys, shared task types, SEO metadata helpers, and public route coverage.
+
+### Affected Phases
+- None (additive change)
+
+### Contract Updates
+- Added `GET /api/v1/public/tasks` for published task catalog reads with optional search and difficulty filters.
+- Added `GET /api/v1/public/tasks/{slug}` for published task theory detail reads with TOC, metadata, asset manifest, and public practice CTA preview data.
+- Added public DTO/interface contracts: `PublicTaskSummary`, `PublicTaskDetail`, `TheoryTocItem`, `PublicPracticePreview`, and `CatalogFilters`.
+- No new persistent data, migrations, or environment variables.
+
+### Notes
+Public APIs, SSR pages, sitemap, and SEO surfaces expose published tasks only; `/topics` remains a frontend catalog label, not a backend topic entity.
+
 ## 2026-05-28 — Phase 02 complete
 
 **Type**: phase-completion

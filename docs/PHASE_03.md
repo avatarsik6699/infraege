@@ -8,7 +8,7 @@
 |-------|-------|
 | Phase | `03` |
 | Title | Public Catalog + SSR Theory |
-| Status | `⏳ pending` |
+| Status | `✅ done` |
 | Tag | `v0.03.0` |
 | Depends on | PHASE_02 gate passing |
 
@@ -186,10 +186,10 @@ feat(phase-03): public catalog and SSR theory pages
 
 - [x] All Scope checkboxes checked (or deferred in Architect Review Notes)
 - [x] `docs/PHASE_03_NOTES.md` complete — agent execution memory recorded
-- [ ] All automated gate checks green
-- [ ] All architect review notes resolved
-- [ ] `docs/CONTEXT.md` updated — run `/context-update 03`
-- [ ] `docs/STATE.md` phase row updated to `✅ done`
-- [ ] `docs/CHANGELOG.md` entry added (if contracts changed)
+- [x] All automated gate checks green
+- [x] All architect review notes resolved
+- [x] `docs/CONTEXT.md` updated — run `/context-update 03`
+- [x] `docs/STATE.md` phase row updated to `✅ done`
+- [x] `docs/CHANGELOG.md` entry added (if contracts changed)
 - [ ] Committed atomically on `feat/phase-03` branch
 - [ ] Tag created after merge to develop: `git tag -a v0.03.0 -m "Phase 03: Public Catalog + SSR Theory"`
