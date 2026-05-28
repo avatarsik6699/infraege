@@ -5,7 +5,7 @@ title: "Задание 25"
 summary: "Базовый шаблон теории и практики для задания 25."
 difficulty: high
 estimated_minutes: 8
-status: draft
+status: published
 practice_items:
   - id: ege-25-001
     position: 1

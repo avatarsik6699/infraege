@@ -5,7 +5,7 @@ title: "Задание 10"
 summary: "Базовый шаблон теории и практики для задания 10."
 difficulty: medium
 estimated_minutes: 6
-status: draft
+status: published
 practice_items:
   - id: ege-10-001
     position: 1

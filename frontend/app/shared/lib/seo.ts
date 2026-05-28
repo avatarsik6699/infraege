@@ -61,5 +61,25 @@ export function buildRouteMeta(input: RouteSeoInput): MetaDescriptor[] {
 }
 
 export function isPublicIndexableRoute(pathname: string): boolean {
-	return publicIndexableRoutes.includes(pathname as (typeof publicIndexableRoutes)[number]);
+	return (
+		publicIndexableRoutes.includes(pathname as (typeof publicIndexableRoutes)[number]) || pathname.startsWith('/tasks/')
+	);
+}
+
+export function buildCatalogMeta(): MetaDescriptor[] {
+	return buildRouteMeta({
+		pathname: '/topics',
+		title: 'Каталог заданий',
+		description: 'Каталог опубликованных заданий ЕГЭ по информатике с теорией и переходом к практике.',
+		profile: 'publicIndexable',
+	});
+}
+
+export function buildTaskMeta(input: { slug: string; title: string; description?: string | null }): MetaDescriptor[] {
+	return buildRouteMeta({
+		pathname: `/tasks/${input.slug}`,
+		title: input.title,
+		description: input.description ?? 'Теория и практика по заданию ЕГЭ по информатике.',
+		profile: 'publicIndexable',
+	});
 }

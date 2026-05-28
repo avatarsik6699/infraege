@@ -5,7 +5,7 @@ title: "Задание 17"
 summary: "Базовый шаблон теории и практики для задания 17."
 difficulty: basic
 estimated_minutes: 5
-status: draft
+status: published
 practice_items:
   - id: ege-17-001
     position: 1

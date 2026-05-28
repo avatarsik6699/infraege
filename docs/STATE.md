@@ -17,6 +17,7 @@
 |----------|------------|--------|------|---------|-------|
 | PHASE_01 | ✅ done | v0.01.0 | ✅ | 🤖 agent | Foundation, Auth Shell, Design Tokens |
 | PHASE_02 | ✅ done | v0.02.0 | ✅ | 🤖 agent | Content Model + Authoring Pipeline |
+| PHASE_03 | ⏳ pending | v0.03.0 | ⬜ | — | Public Catalog + SSR Theory |
 
 <!-- Add new rows here via /phase-init N -->
 

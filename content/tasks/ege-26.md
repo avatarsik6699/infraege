@@ -5,7 +5,7 @@ title: "Задание 26"
 summary: "Базовый шаблон теории и практики для задания 26."
 difficulty: high
 estimated_minutes: 8
-status: draft
+status: published
 practice_items:
   - id: ege-26-001
     position: 1

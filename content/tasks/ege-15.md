@@ -5,7 +5,7 @@ title: "Задание 15"
 summary: "Базовый шаблон теории и практики для задания 15."
 difficulty: medium
 estimated_minutes: 6
-status: draft
+status: published
 practice_items:
   - id: ege-15-001
     position: 1

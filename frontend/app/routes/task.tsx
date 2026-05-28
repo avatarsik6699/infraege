@@ -1,23 +1,13 @@
-import { PlaceholderPage } from '@pages/placeholder';
-import { buildRouteMeta } from '@shared/lib/seo';
+import TaskPage, { loadTaskPage, taskRouteMeta, type TaskRouteData } from '@pages/task';
 
-export function meta() {
-	return buildRouteMeta({
-		pathname: '/tasks/:slug',
-		title: 'Теория',
-		description: 'Страница теории по заданию ЕГЭ.',
-		profile: 'publicIndexable',
-	});
+export function meta({ data }: { data?: TaskRouteData }) {
+	return taskRouteMeta(data);
 }
 
-export default function TaskRoute() {
-	return (
-		<PlaceholderPage
-			kicker='Теория'
-			title='Страница задания'
-			description='В следующих фазах здесь будут теория, оглавление, примеры кода и переход к практике.'
-			ctaHref='/topics'
-			ctaLabel='К темам'
-		/>
-	);
+export async function loader({ params }: { params: { slug?: string } }): Promise<TaskRouteData> {
+	return loadTaskPage(params);
+}
+
+export default function TaskRoute({ loaderData }: { loaderData: TaskRouteData }) {
+	return <TaskPage task={loaderData.task} />;
 }

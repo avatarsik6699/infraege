@@ -5,7 +5,7 @@ title: "Задание 8"
 summary: "Базовый шаблон теории и практики для задания 8."
 difficulty: basic
 estimated_minutes: 5
-status: draft
+status: published
 practice_items:
   - id: ege-08-001
     position: 1

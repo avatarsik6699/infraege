@@ -5,7 +5,7 @@ title: "Задание 3"
 summary: "Базовый шаблон теории и практики для задания 3."
 difficulty: basic
 estimated_minutes: 5
-status: draft
+status: published
 practice_items:
   - id: ege-03-001
     position: 1

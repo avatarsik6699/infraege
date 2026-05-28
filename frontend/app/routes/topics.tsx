@@ -1,23 +1,14 @@
-import { PlaceholderPage } from '@pages/placeholder';
-import { buildRouteMeta } from '@shared/lib/seo';
+import TopicsPage, { loadTopicsPage } from '@pages/topics';
+import { buildCatalogMeta } from '@shared/lib/seo';
 
 export function meta() {
-	return buildRouteMeta({
-		pathname: '/topics',
-		title: 'Темы',
-		description: 'Каталог заданий ЕГЭ по информатике.',
-		profile: 'publicIndexable',
-	});
+	return buildCatalogMeta();
 }
 
-export default function TopicsRoute() {
-	return (
-		<PlaceholderPage
-			kicker='Каталог'
-			title='Темы ЕГЭ'
-			description='Здесь появится каталог 27 заданий с фильтрами, прогрессом и быстрым переходом к теории.'
-			ctaHref='/'
-			ctaLabel='На главную'
-		/>
-	);
+export async function loader() {
+	return loadTopicsPage();
+}
+
+export default function TopicsRoute({ loaderData }: { loaderData: Awaited<ReturnType<typeof loader>> }) {
+	return <TopicsPage tasks={loaderData.tasks} />;
 }

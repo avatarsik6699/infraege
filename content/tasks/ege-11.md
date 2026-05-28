@@ -5,7 +5,7 @@ title: "Задание 11"
 summary: "Базовый шаблон теории и практики для задания 11."
 difficulty: basic
 estimated_minutes: 5
-status: draft
+status: published
 practice_items:
   - id: ege-11-001
     position: 1

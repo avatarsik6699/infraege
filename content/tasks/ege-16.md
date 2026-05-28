@@ -5,7 +5,7 @@ title: "Задание 16"
 summary: "Базовый шаблон теории и практики для задания 16."
 difficulty: basic
 estimated_minutes: 5
-status: draft
+status: published
 practice_items:
   - id: ege-16-001
     position: 1

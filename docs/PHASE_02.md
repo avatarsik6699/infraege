@@ -285,5 +285,5 @@ feat(phase-02): add content model and import pipeline
 - [x] `docs/CONTEXT.md` updated — run `/context-update 02`
 - [x] `docs/STATE.md` phase row updated to `✅ done`
 - [x] `docs/CHANGELOG.md` entry added (if contracts changed)
-- [ ] Committed atomically on `feat/phase-02` branch
-- [ ] Tag created after merge to main: `git tag -a v0.02.0 -m "Phase 02: Content Model + Authoring Pipeline"`
+- [x] Committed atomically on `feat/phase-02` branch
+- [x] Tag created after merge to main: `git tag -a v0.02.0 -m "Phase 02: Content Model + Authoring Pipeline"`

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 from app.modules.tasks.models import ContentStatus, TaskDifficulty
 
@@ -59,3 +59,40 @@ class TaskOut(BaseModel):
     published_at: datetime | None
     created_at: datetime
     updated_at: datetime
+
+
+class TheoryTocItem(BaseModel):
+    id: str
+    title: str
+    depth: int = Field(validation_alias=AliasChoices("depth", "level"))
+
+
+class PublicPracticePreview(BaseModel):
+    id: UUID
+    task_id: UUID = Field(alias="taskId")
+    position: int
+    year: int | None
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class PublicTaskSummary(BaseModel):
+    id: UUID
+    ege_number: int = Field(alias="egeNumber")
+    slug: str
+    title: str
+    summary: str | None
+    difficulty: TaskDifficulty
+    estimated_minutes: int | None = Field(alias="estimatedMinutes")
+    practice_count: int = Field(alias="practiceCount")
+    published_at: datetime | None = Field(alias="publishedAt")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class PublicTaskDetail(PublicTaskSummary):
+    theory_html: str = Field(alias="theoryHtml")
+    theory_toc: list[TheoryTocItem] = Field(alias="theoryToc")
+    asset_manifest: list[AssetManifestItem] = Field(alias="assetManifest")
+    metadata: dict[str, Any]
+    practice: list[PublicPracticePreview]

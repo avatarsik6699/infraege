@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.modules.tasks.models import PracticeItem, Task
+from app.modules.tasks.models import ContentStatus, PracticeItem, Task, TaskDifficulty
 
 
 class TaskRepository:
@@ -30,6 +30,48 @@ class TaskRepository:
             select(Task).options(selectinload(Task.practice_items)).order_by(Task.ege_number)
         )
         return list(result.scalars().all())
+
+    async def list_published(
+        self,
+        *,
+        search: str | None = None,
+        difficulty: TaskDifficulty | None = None,
+    ) -> list[Task]:
+        statement = (
+            select(Task)
+            .options(selectinload(Task.practice_items))
+            .where(Task.status == ContentStatus.published)
+            .order_by(Task.ege_number)
+        )
+
+        if difficulty is not None:
+            statement = statement.where(Task.difficulty == difficulty)
+
+        result = await self._session.execute(statement)
+        tasks = list(result.scalars().all())
+
+        normalized_search = search.casefold().strip() if search else ""
+        if not normalized_search:
+            return tasks
+
+        return [
+            task
+            for task in tasks
+            if normalized_search
+            in " ".join(
+                value
+                for value in (task.title, task.summary, task.slug)
+                if value is not None
+            ).casefold()
+        ]
+
+    async def get_published_by_slug(self, slug: str) -> Task | None:
+        result = await self._session.execute(
+            select(Task)
+            .options(selectinload(Task.practice_items))
+            .where(Task.slug == slug, Task.status == ContentStatus.published)
+        )
+        return result.scalar_one_or_none()
 
     async def upsert_task(self, task: Task, practice_items: Iterable[PracticeItem]) -> Task:
         existing = await self.get_by_slug(task.slug)

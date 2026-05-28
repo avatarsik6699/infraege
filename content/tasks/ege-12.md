@@ -5,7 +5,7 @@ title: "Задание 12"
 summary: "Базовый шаблон теории и практики для задания 12."
 difficulty: basic
 estimated_minutes: 5
-status: draft
+status: published
 practice_items:
   - id: ege-12-001
     position: 1

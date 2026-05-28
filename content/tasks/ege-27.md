@@ -5,7 +5,7 @@ title: "Задание 27"
 summary: "Базовый шаблон теории и практики для задания 27."
 difficulty: high
 estimated_minutes: 8
-status: draft
+status: published
 practice_items:
   - id: ege-27-001
     position: 1

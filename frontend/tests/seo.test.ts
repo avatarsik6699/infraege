@@ -33,6 +33,7 @@ describe('seo helpers', () => {
 	it('keeps only explicit public routes indexable', () => {
 		expect(isPublicIndexableRoute('/')).toBe(true);
 		expect(isPublicIndexableRoute('/topics')).toBe(true);
+		expect(isPublicIndexableRoute('/tasks/ege-01')).toBe(true);
 		expect(isPublicIndexableRoute('/privacy')).toBe(true);
 		expect(isPublicIndexableRoute('/terms')).toBe(true);
 		expect(isPublicIndexableRoute('/login')).toBe(false);

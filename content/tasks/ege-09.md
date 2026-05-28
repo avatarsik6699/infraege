@@ -5,7 +5,7 @@ title: "Задание 9"
 summary: "Базовый шаблон теории и практики для задания 9."
 difficulty: basic
 estimated_minutes: 5
-status: draft
+status: published
 practice_items:
   - id: ege-09-001
     position: 1

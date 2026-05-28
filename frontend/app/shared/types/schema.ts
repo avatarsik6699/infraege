@@ -157,10 +157,59 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Public Tasks */
+        get: operations["list_public_tasks_api_v1_public_tasks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/tasks/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Public Task */
+        get: operations["get_public_task_api_v1_public_tasks__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AssetManifestItem */
+        AssetManifestItem: {
+            /** Url */
+            url: string;
+            /** Alt */
+            alt: string;
+            /** Width */
+            width?: number | null;
+            /** Height */
+            height?: number | null;
+            /** Original Path */
+            original_path: string;
+            /** Optimized Path */
+            optimized_path?: string | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -175,6 +224,81 @@ export interface components {
             email: string;
             /** Password */
             password: string;
+        };
+        /** PublicPracticePreview */
+        PublicPracticePreview: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Taskid
+             * Format: uuid
+             */
+            taskId: string;
+            /** Position */
+            position: number;
+            /** Year */
+            year: number | null;
+        };
+        /** PublicTaskDetail */
+        PublicTaskDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Egenumber */
+            egeNumber: number;
+            /** Slug */
+            slug: string;
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string | null;
+            difficulty: components["schemas"]["TaskDifficulty"];
+            /** Estimatedminutes */
+            estimatedMinutes: number | null;
+            /** Practicecount */
+            practiceCount: number;
+            /** Publishedat */
+            publishedAt: string | null;
+            /** Theoryhtml */
+            theoryHtml: string;
+            /** Theorytoc */
+            theoryToc: components["schemas"]["TheoryTocItem"][];
+            /** Assetmanifest */
+            assetManifest: components["schemas"]["AssetManifestItem"][];
+            /** Metadata */
+            metadata: {
+                [key: string]: unknown;
+            };
+            /** Practice */
+            practice: components["schemas"]["PublicPracticePreview"][];
+        };
+        /** PublicTaskSummary */
+        PublicTaskSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Egenumber */
+            egeNumber: number;
+            /** Slug */
+            slug: string;
+            /** Title */
+            title: string;
+            /** Summary */
+            summary: string | null;
+            difficulty: components["schemas"]["TaskDifficulty"];
+            /** Estimatedminutes */
+            estimatedMinutes: number | null;
+            /** Practicecount */
+            practiceCount: number;
+            /** Publishedat */
+            publishedAt: string | null;
         };
         /** RefreshRequest */
         RefreshRequest: {
@@ -195,6 +319,20 @@ export interface components {
              * @constant
              */
             consent_152fz: true;
+        };
+        /**
+         * TaskDifficulty
+         * @enum {string}
+         */
+        TaskDifficulty: "basic" | "medium" | "high";
+        /** TheoryTocItem */
+        TheoryTocItem: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /** Depth */
+            depth: number;
         };
         /** TokenPair */
         TokenPair: {
@@ -487,6 +625,69 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    list_public_tasks_api_v1_public_tasks_get: {
+        parameters: {
+            query?: {
+                search?: string | null;
+                difficulty?: components["schemas"]["TaskDifficulty"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicTaskSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_public_task_api_v1_public_tasks__slug__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicTaskDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -5,7 +5,7 @@ title: "Задание 14"
 summary: "Базовый шаблон теории и практики для задания 14."
 difficulty: basic
 estimated_minutes: 5
-status: draft
+status: published
 practice_items:
   - id: ege-14-001
     position: 1

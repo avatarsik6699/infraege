@@ -7,6 +7,9 @@ uv run alembic upgrade head
 echo "Running database seeders..."
 uv run python scripts/seed.py
 
+echo "Importing repository content..."
+uv run python -m app.content import
+
 echo "Starting Uvicorn..."
 # exec replaces the shell process with uvicorn so it becomes PID 1 and receives SIGTERM directly → graceful shutdown
 if [ "${APP_ENV}" = "development" ]; then

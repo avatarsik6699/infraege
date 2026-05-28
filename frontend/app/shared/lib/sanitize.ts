@@ -11,6 +11,9 @@ import { isNonEmptyString, isNonNil } from '@shared/lib/type-guards';
  */
 const ALLOWED_TAGS = new Set(['h1', 'h2', 'h3', 'p', 'strong', 'em', 'code', 'pre', 'ul', 'ol', 'li', 'br', 'img']);
 const ALLOWED_ATTRS_BY_TAG: Record<string, Set<string>> = {
+	h1: new Set(['id']),
+	h2: new Set(['id']),
+	h3: new Set(['id']),
 	img: new Set(['src', 'alt', 'width', 'height', 'loading', 'decoding']),
 };
 

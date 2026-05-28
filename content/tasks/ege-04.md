@@ -5,7 +5,7 @@ title: "Задание 4"
 summary: "Базовый шаблон теории и практики для задания 4."
 difficulty: basic
 estimated_minutes: 5
-status: draft
+status: published
 practice_items:
   - id: ege-04-001
     position: 1

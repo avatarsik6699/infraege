@@ -5,7 +5,7 @@ title: "Задание 13"
 summary: "Базовый шаблон теории и практики для задания 13."
 difficulty: basic
 estimated_minutes: 5
-status: draft
+status: published
 practice_items:
   - id: ege-13-001
     position: 1
