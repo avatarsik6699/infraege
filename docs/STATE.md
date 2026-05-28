@@ -1,4 +1,4 @@
-# STATE: Template App Development Tracker
+# STATE: infraege Development Tracker
 
 > **Status legend**
 > `⏳ pending` — not started
@@ -15,7 +15,7 @@
 
 | Phase    | Status     | Tag    | Gate | Impl By | Notes |
 |----------|------------|--------|------|---------|-------|
-| -        | -          | -      | -    | -       | No phases yet — run `/phase-init 01` |
+| -        | -          | -      | -    | -       | No phases yet — run `/phase-init 01` from the infraege SPEC v2.1 |
 
 <!-- Add new rows here via /phase-init N -->
 
