@@ -4,7 +4,7 @@ import { buildRouteMeta } from '@shared/lib/seo';
 export function meta() {
 	return buildRouteMeta({
 		pathname: '/',
-		description: 'Reusable FastAPI + React Router SSR template.',
+		description: 'Подготовка к ЕГЭ по информатике: теория, практика и прогресс.',
 		profile: 'publicIndexable',
 	});
 }

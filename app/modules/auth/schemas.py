@@ -4,12 +4,12 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
+    email: EmailStr = Field(max_length=254)
+    password: str = Field(min_length=1, max_length=128)
 
 
 class RefreshRequest(BaseModel):
-    refresh_token: str
+    refresh_token: str = Field(min_length=1, max_length=4096)
 
 
 class TokenPair(BaseModel):
@@ -19,10 +19,6 @@ class TokenPair(BaseModel):
 
 
 class RegisterRequest(BaseModel):
-    email: EmailStr
+    email: EmailStr = Field(max_length=254)
     password: str = Field(min_length=8, max_length=128)
     consent_152fz: Literal[True]
-
-
-class AccountDeletionResponse(BaseModel):
-    deleted: bool

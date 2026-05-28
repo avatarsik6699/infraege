@@ -40,7 +40,7 @@ function readClientEnv(): ClientEnvSchema {
 
 	return {
 		VITE_API_BASE_URL: isNonEmptyString(configuredApiBaseUrl) ? configuredApiBaseUrl : fallbackApiBaseUrl,
-		VITE_PUBLIC_APP_NAME: isNonEmptyString(configuredAppName) ? configuredAppName : 'Template App',
+		VITE_PUBLIC_APP_NAME: isNonEmptyString(configuredAppName) ? configuredAppName : 'infraege',
 		VITE_PUBLIC_SITE_URL: isNonEmptyString(configuredSiteUrl) ? configuredSiteUrl : fallbackSiteUrl,
 	};
 }

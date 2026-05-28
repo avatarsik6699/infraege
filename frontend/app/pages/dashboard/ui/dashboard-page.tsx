@@ -1,18 +1,16 @@
-import { useTranslation } from 'react-i18next';
-
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/ui/card';
 
 export function DashboardPage() {
-	const { t } = useTranslation('common');
-
 	return (
 		<main className='shell'>
 			<Card className='card'>
 				<CardHeader>
-					<CardTitle>{t('brand')}</CardTitle>
+					<CardTitle>infraege</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<p className='text-muted-foreground'>Starter authenticated area placeholder.</p>
+					<p className='text-muted-foreground'>
+						Черновой кабинет. Статистика и синхронизация появятся в отдельной фазе.
+					</p>
 				</CardContent>
 			</Card>
 		</main>

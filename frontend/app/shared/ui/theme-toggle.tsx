@@ -1,17 +1,20 @@
 import { useTheme } from 'next-themes';
-import { useTranslation } from 'react-i18next';
 
 import { Button } from '@shared/ui/button';
 
 const themes = ['light', 'dark', 'system'] as const;
+const themeLabels = {
+	light: 'Светлая',
+	dark: 'Темная',
+	system: 'Системная',
+} as const;
 
 export function ThemeToggle() {
 	const { theme, setTheme } = useTheme();
-	const { t } = useTranslation('common');
 
 	return (
 		<div className='flex items-center gap-2'>
-			<span className='text-xs text-muted-foreground'>{t('theme')}</span>
+			<span className='text-xs text-muted-foreground'>Тема</span>
 			<div className='inline-flex rounded-lg border border-border bg-background p-1'>
 				{themes.map(value => (
 					<Button
@@ -22,7 +25,7 @@ export function ThemeToggle() {
 						onClick={() => setTheme(value)}
 						className='capitalize'
 					>
-						{t(value)}
+						{themeLabels[value]}
 					</Button>
 				))}
 			</div>

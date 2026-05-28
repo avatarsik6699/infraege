@@ -4,7 +4,6 @@ from app.core.config import settings
 from app.core.rate_limit import limiter
 from app.modules.auth.dependencies import get_auth_service, get_current_user
 from app.modules.auth.schemas import (
-    AccountDeletionResponse,
     LoginRequest,
     RefreshRequest,
     RegisterRequest,
@@ -49,15 +48,6 @@ async def refresh(
 @router.get("/me", response_model=UserOut)
 async def me(current_user: User = Depends(get_current_user)) -> UserOut:
     return UserOut.model_validate(current_user)
-
-
-@router.delete("/me", response_model=AccountDeletionResponse)
-async def delete_me(
-    current_user: User = Depends(get_current_user),
-    service: AuthService = Depends(get_auth_service),
-) -> AccountDeletionResponse:
-    await service.delete_account(current_user)
-    return AccountDeletionResponse(deleted=True)
 
 
 @router.post("/logout", status_code=status.HTTP_200_OK)

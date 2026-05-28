@@ -1,16 +1,14 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { useRegisterMutation } from '@shared/api/auth';
 import { useRouter } from '@shared/hooks/use-router';
+import { AppLink } from '@shared/ui/app-link';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
 
 export function RegisterForm() {
-	const { t } = useTranslation('common');
-	const { t: tErrors } = useTranslation('errors');
 	const router = useRouter();
 	const registerMutation = useRegisterMutation();
 	const [email, setEmail] = useState('');
@@ -32,7 +30,7 @@ export function RegisterForm() {
 	return (
 		<form className='grid gap-4' onSubmit={onSubmit}>
 			<div className='grid gap-1.5'>
-				<Label htmlFor='register-email'>{t('email')}</Label>
+				<Label htmlFor='register-email'>Email</Label>
 				<Input
 					id='register-email'
 					type='email'
@@ -42,7 +40,7 @@ export function RegisterForm() {
 				/>
 			</div>
 			<div className='grid gap-1.5'>
-				<Label htmlFor='register-password'>{t('password')}</Label>
+				<Label htmlFor='register-password'>Пароль</Label>
 				<Input
 					id='register-password'
 					type='password'
@@ -59,12 +57,17 @@ export function RegisterForm() {
 					checked={consent}
 					onChange={event => setConsent(event.target.checked)}
 				/>
-				<span>{t('register.consent')}</span>
+				<span>Я согласен на обработку персональных данных по 152-ФЗ.</span>
 			</label>
-			{blocked ? <p className='text-sm text-destructive'>{t('register.consentRequired')}</p> : null}
-			{registerMutation.isError ? <p className='text-sm text-destructive'>{tErrors('unableRegister')}</p> : null}
+			{blocked ? <p className='text-sm text-destructive'>Согласие обязательно для создания аккаунта.</p> : null}
+			{registerMutation.isError ? (
+				<p className='text-sm text-destructive'>Не удалось создать аккаунт.</p>
+			) : null}
 			<Button type='submit' disabled={registerMutation.isPending}>
-				{registerMutation.isPending ? t('register.creating') : t('register.submit')}
+				{registerMutation.isPending ? 'Создание...' : 'Создать аккаунт'}
+			</Button>
+			<Button asChild type='button' variant='outline'>
+				<AppLink to='/topics'>Продолжить как гость</AppLink>
 			</Button>
 		</form>
 	);

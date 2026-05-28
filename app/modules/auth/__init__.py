@@ -9,7 +9,6 @@ from app.modules.auth.exceptions import (
     NotAuthenticated,
 )
 from app.modules.auth.schemas import (
-    AccountDeletionResponse,
     LoginRequest,
     RefreshRequest,
     RegisterRequest,
@@ -34,7 +33,6 @@ __all__ = [
     "NotAuthenticated",
     "RefreshRequest",
     "RegisterRequest",
-    "AccountDeletionResponse",
     "TokenPair",
     "create_access_token",
     "create_refresh_token",

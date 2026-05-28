@@ -1,6 +1,6 @@
 export const defaultSiteUrl = 'http://localhost:3000';
-export const defaultAppName = 'Template App';
-export const publicIndexableRoutes = ['/'];
+export const defaultAppName = 'infraege';
+export const publicIndexableRoutes = ['/', '/topics', '/privacy', '/terms'];
 
 export function normalizeSiteUrl(value) {
 	try {

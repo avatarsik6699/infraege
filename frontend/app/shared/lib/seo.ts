@@ -16,10 +16,10 @@ type RouteSeoInput = {
 	profile: SeoProfile;
 };
 
-const defaultDescription = 'Reusable FastAPI + React Router SSR template.';
+const defaultDescription = 'Подготовка к ЕГЭ по информатике: теория, практика и прогресс.';
 const noIndexContent = 'noindex,nofollow';
 
-export const publicIndexableRoutes = ['/'] as const;
+export const publicIndexableRoutes = ['/', '/topics', '/privacy', '/terms'] as const;
 
 function joinUrl(baseUrl: string, pathname: string): string {
 	const normalizedPathname = pathname.startsWith('/') ? pathname : `/${pathname}`;

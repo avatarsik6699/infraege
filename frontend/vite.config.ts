@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 function readPublicAppName(): string {
 	const value = process.env.VITE_PUBLIC_APP_NAME?.trim();
-	return value !== undefined && value.length > 0 ? value : 'Template App';
+	return value !== undefined && value.length > 0 ? value : 'infraege';
 }
 
 function readPublicSiteUrl(command: string, mode: string): string {
@@ -34,9 +34,9 @@ export default defineConfig(({ command, mode }) => {
 				manifest: {
 					name: appName,
 					short_name: appName,
-					description: 'Reusable FastAPI + React Router SSR template.',
-					theme_color: '#ffffff',
-					background_color: '#ffffff',
+					description: 'Подготовка к ЕГЭ по информатике: теория, практика и прогресс.',
+					theme_color: '#fbfaf7',
+					background_color: '#fbfaf7',
 					display: 'standalone',
 					scope: '/',
 					start_url: '/',

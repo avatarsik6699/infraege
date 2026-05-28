@@ -1,7 +1,7 @@
 [project]
-name = "template-app"
+name = "infraege"
 version = "0.1.0"
-description = "Reusable FastAPI backend template"
+description = "EGE computer science preparation platform"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.0",

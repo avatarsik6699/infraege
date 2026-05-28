@@ -54,6 +54,26 @@ async def test_login_wrong_password(client: AsyncClient, test_user: User) -> Non
     assert resp.status_code == 401
 
 
+async def test_login_validates_password_length(client: AsyncClient, test_user: User) -> None:
+    resp = await client.post(
+        "/api/v1/public/auth/login",
+        json={"email": test_user.email, "password": "x" * 129},
+    )
+    assert resp.status_code == 422
+
+
+async def test_login_rate_limit_blocks_abuse(client: AsyncClient, test_user: User) -> None:
+    status_codes: list[int] = []
+    for _ in range(21):
+        response = await client.post(
+            "/api/v1/public/auth/login",
+            json={"email": test_user.email, "password": "wrongpassword"},
+        )
+        status_codes.append(response.status_code)
+
+    assert 429 in status_codes
+
+
 async def test_refresh_rotates_token_pair(client: AsyncClient, test_user: User) -> None:
     login = await client.post(
         "/api/v1/public/auth/login",
@@ -102,3 +122,11 @@ async def test_logout_with_valid_token(client: AsyncClient, access_headers: dict
 async def test_logout_without_token(client: AsyncClient) -> None:
     resp = await client.post("/api/v1/public/auth/logout")
     assert resp.status_code == 401
+
+
+async def test_account_deletion_is_out_of_phase_01(
+    client: AsyncClient,
+    access_headers: dict[str, str],
+) -> None:
+    resp = await client.delete("/api/v1/public/auth/me", headers=access_headers)
+    assert resp.status_code == 405

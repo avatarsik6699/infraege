@@ -1,12 +1,10 @@
 import { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
 
 import { useLogoutMutation, useSessionSummary } from '@shared/api/auth';
 import { clipboard } from '@shared/lib/clipboard';
 import { isNonEmptyString } from '@shared/lib/type-guards';
 import { Button } from '@shared/ui/button';
-import { LanguageSwitcher } from '@shared/ui/language-switcher';
 import { ThemeToggle } from '@shared/ui/theme-toggle';
 
 function maskToken(value: string): string {
@@ -16,7 +14,6 @@ function maskToken(value: string): string {
 
 export function AppTopBar() {
 	const { pathname } = useLocation();
-	const { t } = useTranslation('common');
 	const { accessToken, isAuthenticated, meQuery } = useSessionSummary();
 	const logoutMutation = useLogoutMutation();
 	const [isTokenVisible, setIsTokenVisible] = useState(false);
@@ -45,48 +42,45 @@ export function AppTopBar() {
 			<div className='topbar-inner'>
 				<div className='flex items-center gap-3'>
 					<Link to='/' className='text-sm font-semibold tracking-tight'>
-						{t('brand')}
+						infraege
 					</Link>
-					<LanguageSwitcher />
 					<ThemeToggle />
 				</div>
 				{isCompact ? null : (
 					<div className='flex flex-wrap items-center justify-end gap-2'>
 						{!isAuthenticated ? (
 							<>
-								<span className='text-xs text-muted-foreground'>{t('auth.status.guest')}</span>
+								<span className='text-xs text-muted-foreground'>Не авторизован</span>
 								<Button asChild size='sm' variant='outline'>
-									<Link to='/login'>{t('auth.cta.signIn')}</Link>
+									<Link to='/login'>Войти</Link>
 								</Button>
 								<Button asChild size='sm' variant='ghost'>
-									<Link to='/register'>{t('auth.cta.register')}</Link>
+									<Link to='/register'>Регистрация</Link>
 								</Button>
 							</>
 						) : (
 							<>
 								{meQuery.isLoading ? (
-									<span className='text-xs text-muted-foreground'>{t('auth.status.loading')}</span>
+									<span className='text-xs text-muted-foreground'>Загрузка профиля...</span>
 								) : meQuery.isError ? (
 									<>
-										<span className='text-xs text-destructive'>{t('auth.status.error')}</span>
+										<span className='text-xs text-destructive'>Не удалось загрузить профиль</span>
 										<Button type='button' size='sm' variant='ghost' onClick={() => void meQuery.refetch()}>
-											{t('auth.cta.retry')}
+											Повторить
 										</Button>
 									</>
 								) : (
 									<span className='text-xs text-muted-foreground'>
-										{t('auth.signedInAs', {
-											email: meQuery.data?.email ?? t('auth.unknown'),
-											role: t(`auth.roles.${meQuery.data?.role ?? 'user'}`),
-											status: meQuery.data?.is_active === true ? t('auth.active') : t('auth.inactive'),
-										})}
+										{meQuery.data?.email ?? 'неизвестно'} ·{' '}
+										{meQuery.data?.role === 'admin' ? 'админ' : 'пользователь'} ·{' '}
+										{meQuery.data?.is_active === true ? 'активен' : 'неактивен'}
 									</span>
 								)}
 								<Button asChild size='sm' variant='outline'>
-									<Link to='/dashboard'>{t('auth.cta.dashboard')}</Link>
+									<Link to='/dashboard'>Кабинет</Link>
 								</Button>
 								<div className='flex items-center gap-2 rounded-md border border-border px-2 py-1'>
-									<span className='text-xs text-muted-foreground'>{t('auth.apiToken')}</span>
+									<span className='text-xs text-muted-foreground'>API токен</span>
 									<code className='max-w-[220px] truncate text-xs'>{tokenPreview}</code>
 									<Button
 										type='button'
@@ -94,17 +88,17 @@ export function AppTopBar() {
 										variant='ghost'
 										onClick={() => setIsTokenVisible(current => !current)}
 									>
-										{isTokenVisible ? t('auth.cta.hide') : t('auth.cta.show')}
+										{isTokenVisible ? 'Скрыть' : 'Показать'}
 									</Button>
 									<Button type='button' size='sm' variant='ghost' onClick={() => void onCopyToken()}>
-										{t('auth.cta.copy')}
+										Копировать
 									</Button>
 								</div>
-								<span className='text-xs text-muted-foreground'>{t('auth.swaggerHint')}</span>
+								<span className='text-xs text-muted-foreground'>Для /docs: Bearer &lt;access_token&gt;</span>
 								{copyState === 'success' ? (
-									<span className='text-xs text-emerald-600'>{t('auth.copySuccess')}</span>
+									<span className='text-xs text-emerald-600'>Скопировано</span>
 								) : null}
-								{copyState === 'error' ? <span className='text-xs text-destructive'>{t('auth.copyError')}</span> : null}
+								{copyState === 'error' ? <span className='text-xs text-destructive'>Ошибка копирования</span> : null}
 								<Button
 									type='button'
 									size='sm'
@@ -112,7 +106,7 @@ export function AppTopBar() {
 									disabled={logoutMutation.isPending}
 									onClick={() => logoutMutation.mutate()}
 								>
-									{t('auth.cta.signOut')}
+									Выйти
 								</Button>
 							</>
 						)}

@@ -38,7 +38,9 @@ services:
       dockerfile: Dockerfile.backend
     restart: unless-stopped
     logging: *json-file-logging
-    env_file: .env
+    env_file:
+      - path: .env
+        required: false
     depends_on:
       db:
         condition: service_healthy
@@ -57,7 +59,9 @@ services:
       dockerfile: ../Dockerfile.frontend
     restart: unless-stopped
     logging: *json-file-logging
-    env_file: .env
+    env_file:
+      - path: .env
+        required: false
     environment:
       VITE_API_BASE_URL: ${API_BASE_URL:-http://localhost:8000}
       API_BASE_INTERNAL_URL: ${API_BASE_INTERNAL_URL:-http://backend:8000}

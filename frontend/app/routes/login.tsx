@@ -4,8 +4,8 @@ import { buildRouteMeta } from '@shared/lib/seo';
 export function meta() {
 	return buildRouteMeta({
 		pathname: '/login',
-		title: 'Login',
-		description: 'Sign in to Template App.',
+		title: 'Вход',
+		description: 'Вход в аккаунт infraege.',
 		profile: 'privateNoIndex',
 	});
 }

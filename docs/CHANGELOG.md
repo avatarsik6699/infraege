@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-05-28 — Phase 01 complete
+
+**Type**: phase-completion
+**Author**: AI (context-update)
+**Triggered by**: PHASE_01 gate passed
+
+### Changes
+- Added FastAPI foundation, typed settings, structured startup, health checks, auth shell, and users persistence.
+- Added React Router SSR route shell, infraege design tokens, auth skeleton screens, and placeholder MVP routes.
+- Added Docker Compose development infrastructure for backend, frontend, PostgreSQL, Redis, and Nginx.
+
+### Affected Phases
+- None (additive change)
+
+### Contract Updates
+- Added `users` table with `citext`, `user_role`, consent, active flag, and timestamp fields.
+- Added public health endpoint and Phase 01 auth endpoints for register, login, refresh, logout, and current-user reads.
+- Added Phase 01 auth/user/health shared interface names and environment variable keys.
+- Set Alembic current head to `0001_users_table`.
+
+### Notes
+Refresh token rotation remains stateless in Phase 01; persistent refresh-token storage and cookie hardening are deferred by the phase contract.
+
 ## v2.1 — 2026-05-28 — Content authoring workflow clarified
 
 **Type**: spec-change

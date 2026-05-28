@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from 'react-router';
 
 import { appError } from '@shared/lib/app-error';
@@ -20,14 +19,12 @@ export function links() {
 }
 
 export default function App() {
-	const { i18n } = useTranslation();
-
 	useEffect(() => {
 		registerPwaServiceWorker();
 	}, []);
 
 	return (
-		<html lang={i18n.resolvedLanguage ?? 'en'} suppressHydrationWarning>
+		<html lang='ru' suppressHydrationWarning>
 			<head>
 				<meta charSet='utf-8' />
 				<meta name='viewport' content='width=device-width, initial-scale=1' />
@@ -50,8 +47,6 @@ export default function App() {
 }
 
 export function ErrorBoundary() {
-	const { t } = useTranslation('errors');
-	const { i18n } = useTranslation();
 	const routeError = useRouteError();
 	const error = appError.toUiError(routeError);
 
@@ -60,7 +55,7 @@ export function ErrorBoundary() {
 	}, [error.message]);
 
 	return (
-		<html lang={i18n.resolvedLanguage ?? 'en'} suppressHydrationWarning>
+		<html lang='ru' suppressHydrationWarning>
 			<head>
 				<meta charSet='utf-8' />
 				<meta name='viewport' content='width=device-width, initial-scale=1' />
@@ -72,7 +67,7 @@ export function ErrorBoundary() {
 				<AppProvider>
 					<AppTopBar />
 					<main className='shell'>
-						<ErrorState title={t('applicationError')} error={error} />
+						<ErrorState title='Ошибка приложения' error={error} />
 					</main>
 				</AppProvider>
 				<ScrollRestoration />

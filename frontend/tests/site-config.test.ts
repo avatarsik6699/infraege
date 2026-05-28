@@ -19,6 +19,9 @@ describe('site output generators', () => {
 		const sitemap = JSON.parse(runSiteConfigExpression("site.buildSitemapXml('https://example.com')")) as string;
 
 		expect(sitemap).toContain('<loc>https://example.com/</loc>');
+		expect(sitemap).toContain('<loc>https://example.com/topics</loc>');
+		expect(sitemap).toContain('<loc>https://example.com/privacy</loc>');
+		expect(sitemap).toContain('<loc>https://example.com/terms</loc>');
 		expect(sitemap).not.toContain('/login');
 		expect(sitemap).not.toContain('/register');
 		expect(sitemap).not.toContain('/dashboard');

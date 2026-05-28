@@ -3,4 +3,13 @@
 	<url>
 		<loc>http://localhost:3000/</loc>
 	</url>
+	<url>
+		<loc>http://localhost:3000/topics</loc>
+	</url>
+	<url>
+		<loc>http://localhost:3000/privacy</loc>
+	</url>
+	<url>
+		<loc>http://localhost:3000/terms</loc>
+	</url>
 </urlset>

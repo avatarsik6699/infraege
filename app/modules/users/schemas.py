@@ -14,7 +14,9 @@ class UserOut(BaseModel):
     role: UserRole
     is_active: bool
     consent_152fz: bool
+    consent_at: datetime | None
     created_at: datetime
+    updated_at: datetime
 
 
 class UserCreate(BaseModel):

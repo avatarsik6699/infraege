@@ -1,9 +1,9 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { useLoginMutation } from '@shared/api/auth';
 import { useRouter } from '@shared/hooks/use-router';
+import { AppLink } from '@shared/ui/app-link';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
@@ -12,8 +12,6 @@ export const DEFAULT_LOGIN_EMAIL = 'admin@example.com';
 export const DEFAULT_LOGIN_PASSWORD = 'changeme123';
 
 export function LoginForm() {
-	const { t: tCommon } = useTranslation('common');
-	const { t: tErrors } = useTranslation('errors');
 	const router = useRouter();
 	const loginMutation = useLoginMutation();
 	const [email, setEmail] = useState(DEFAULT_LOGIN_EMAIL);
@@ -28,7 +26,7 @@ export function LoginForm() {
 	return (
 		<form className='grid gap-4' onSubmit={onSubmit}>
 			<div className='grid gap-1.5'>
-				<Label htmlFor='email'>{tCommon('email')}</Label>
+				<Label htmlFor='email'>Email</Label>
 				<Input
 					id='email'
 					name='email'
@@ -39,7 +37,7 @@ export function LoginForm() {
 				/>
 			</div>
 			<div className='grid gap-1.5'>
-				<Label htmlFor='password'>{tCommon('password')}</Label>
+				<Label htmlFor='password'>Пароль</Label>
 				<Input
 					id='password'
 					name='password'
@@ -49,9 +47,14 @@ export function LoginForm() {
 					required
 				/>
 			</div>
-			{loginMutation.isError ? <p className='text-sm text-destructive'>{tErrors('unableSignIn')}</p> : null}
+			{loginMutation.isError ? (
+				<p className='text-sm text-destructive'>Не удалось войти с этими данными.</p>
+			) : null}
 			<Button type='submit' disabled={loginMutation.isPending}>
-				{loginMutation.isPending ? tErrors('signingIn') : tErrors('signIn')}
+				{loginMutation.isPending ? 'Вход...' : 'Войти'}
+			</Button>
+			<Button asChild type='button' variant='outline'>
+				<AppLink to='/topics'>Продолжить как гость</AppLink>
 			</Button>
 		</form>
 	);

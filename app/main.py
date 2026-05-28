@@ -32,9 +32,9 @@ def create_app() -> FastAPI:
     openapi_url = None if settings.is_production else "/openapi.json"
 
     app = FastAPI(
-        title="Template App",
+        title="infraege",
         version="0.1.0",
-        description="Reusable FastAPI backend template",
+        description="API for infraege EGE computer science preparation",
         lifespan=lifespan,
         docs_url=docs_url,
         redoc_url=redoc_url,

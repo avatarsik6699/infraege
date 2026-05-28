@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Template App">
-	<rect width="512" height="512" fill="#111827"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="infraege">
+	<rect width="512" height="512" fill="#1f1a14"/>
 	<path d="M132 138h248v70h-89v168h-70V208h-89z" fill="#ffffff"/>
-	<circle cx="326" cy="326" r="58" fill="#38bdf8"/>
+	<circle cx="326" cy="326" r="58" fill="#d97757"/>
 </svg>

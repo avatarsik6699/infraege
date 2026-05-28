@@ -15,7 +15,7 @@
 
 | Phase    | Status     | Tag    | Gate | Impl By | Notes |
 |----------|------------|--------|------|---------|-------|
-| -        | -          | -      | -    | -       | No phases yet — run `/phase-init 01` from the infraege SPEC v2.1 |
+| PHASE_01 | ✅ done | v0.01.0 | ✅ | 🤖 agent | Foundation, Auth Shell, Design Tokens |
 
 <!-- Add new rows here via /phase-init N -->
 

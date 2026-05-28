@@ -4,8 +4,8 @@ import { buildRouteMeta } from '@shared/lib/seo';
 export function meta() {
 	return buildRouteMeta({
 		pathname: '/register',
-		title: 'Register',
-		description: 'Create a Template App account.',
+		title: 'Регистрация',
+		description: 'Регистрация в infraege с согласием 152-ФЗ.',
 		profile: 'privateNoIndex',
 	});
 }
