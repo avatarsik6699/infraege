@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -70,6 +71,23 @@ class TaskRepository:
             select(Task)
             .options(selectinload(Task.practice_items))
             .where(Task.slug == slug, Task.status == ContentStatus.published)
+        )
+        return result.scalar_one_or_none()
+
+    async def get_published_by_id(self, task_id: UUID) -> Task | None:
+        result = await self._session.execute(
+            select(Task)
+            .options(selectinload(Task.practice_items))
+            .where(Task.id == task_id, Task.status == ContentStatus.published)
+        )
+        return result.scalar_one_or_none()
+
+    async def get_published_practice_item(self, item_id: UUID) -> PracticeItem | None:
+        result = await self._session.execute(
+            select(PracticeItem)
+            .join(PracticeItem.task)
+            .options(selectinload(PracticeItem.task))
+            .where(PracticeItem.id == item_id, Task.status == ContentStatus.published)
         )
         return result.scalar_one_or_none()
 

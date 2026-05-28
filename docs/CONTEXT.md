@@ -4,15 +4,15 @@
     "update_rule": "Append contracts after each phase via /context-update. Never remove existing entries."
   },
 
-  "captured_at": "2026-05-28",
-  "phase_completed": "03",
+  "captured_at": "2026-05-29",
+  "phase_completed": "04",
   "phase_in_progress": null,
 
   "product": {
     "name": "infraege",
     "production_domain": "infraege.ru",
     "spec_version": "v2.1",
-    "status": "phase_03_complete"
+    "status": "phase_04_complete"
   },
 
   "stack": {
@@ -42,7 +42,13 @@
     "PublicTaskDetail",
     "TheoryTocItem",
     "PublicPracticePreview",
-    "CatalogFilters"
+    "CatalogFilters",
+    "PublicPracticeItem",
+    "PracticeValidationRequest",
+    "PracticeValidationResponse",
+    "GuestProgressAttempt",
+    "GuestProgressState",
+    "PracticeTrainerState"
   ],
 
   "planned_contract": {
@@ -115,6 +121,18 @@
       "path": "/api/v1/public/tasks/{slug}",
       "auth": "none",
       "contract": "Published-only public task theory detail with metadata, TOC, asset manifest, and practice CTA preview data; response excludes expected_value, answer patterns, validation results, and draft tasks."
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/public/practice/{task_id}",
+      "auth": "none",
+      "contract": "Published-only practice items for a task without expected_value internals; draft tasks return 404."
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/public/validate",
+      "auth": "none",
+      "contract": "{item_id, answer} -> {correct, expected_value?, explanation_html?}; input length capped, regex execution hard-timeout, no raw answers logged."
     }
   ],
 
@@ -238,5 +256,5 @@
 
   "db_seeds": {},
 
-  "notes": "Phase 03 complete. Added published-only public task catalog/detail API contracts and Russian-first SSR public catalog/theory pages."
+  "notes": "Phase 04 complete. Added public practice read and validation endpoints, client-side practice trainer with guest progress localStorage store."
 }

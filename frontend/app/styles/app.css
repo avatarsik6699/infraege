@@ -435,6 +435,133 @@
     @apply mb-2 text-xs text-muted-foreground;
   }
 
+  .practice-page {
+    @apply grid gap-5;
+  }
+
+  .practice-header {
+    @apply grid gap-4 border-b border-border pb-5 lg:grid-cols-[1fr_auto] lg:items-end;
+  }
+
+  .practice-header-meta {
+    @apply grid min-w-24 justify-items-center rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground;
+  }
+
+  .practice-header-meta strong {
+    @apply text-2xl leading-none text-foreground;
+  }
+
+  .practice-progress {
+    @apply grid gap-2 rounded-lg border border-border bg-card p-4;
+  }
+
+  .practice-progress div {
+    @apply flex items-center justify-between gap-3 text-sm text-muted-foreground;
+  }
+
+  .practice-progress progress {
+    @apply h-2 w-full overflow-hidden rounded-full bg-muted;
+  }
+
+  .practice-progress progress::-webkit-progress-bar {
+    @apply bg-muted;
+  }
+
+  .practice-progress progress::-webkit-progress-value {
+    background: var(--green);
+  }
+
+  .practice-progress progress::-moz-progress-bar {
+    background: var(--green);
+  }
+
+  .practice-layout {
+    @apply grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start;
+  }
+
+  .practice-task-panel,
+  .practice-answer-panel,
+  .practice-state-panel {
+    @apply rounded-lg border border-border bg-card p-5;
+  }
+
+  .practice-task-panel {
+    @apply grid gap-4;
+  }
+
+  .practice-task-meta {
+    @apply flex flex-wrap gap-2 text-xs text-muted-foreground;
+  }
+
+  .practice-task-meta span {
+    @apply rounded-md border border-border px-2 py-1;
+  }
+
+  .practice-task-meta span[data-solved='true'] {
+    @apply border-green-300 bg-green-50 text-green-800;
+  }
+
+  .practice-prompt {
+    @apply max-w-3xl text-base leading-7;
+  }
+
+  .practice-prompt p {
+    @apply mb-3;
+  }
+
+  .practice-answer-panel {
+    @apply grid gap-4 lg:sticky lg:top-24;
+  }
+
+  .practice-answer-panel label {
+    @apply grid gap-2 text-sm font-medium;
+  }
+
+  .practice-answer-panel input {
+    @apply h-11 text-base;
+  }
+
+  .practice-answer-panel[data-state='correct'] {
+    @apply border-green-300 bg-green-50;
+  }
+
+  .practice-answer-panel[data-state='incorrect'] {
+    @apply border-red-300 bg-red-50;
+  }
+
+  .practice-feedback {
+    @apply grid min-h-24 content-start gap-2 rounded-lg border border-border bg-background p-3 text-sm text-muted-foreground;
+  }
+
+  .practice-feedback p {
+    @apply flex items-center gap-2;
+  }
+
+  .practice-answer-panel[data-state='correct'] .practice-feedback p {
+    @apply text-green-800;
+  }
+
+  .practice-answer-panel[data-state='incorrect'] .practice-feedback p {
+    @apply text-red-800;
+  }
+
+  .practice-explanation {
+    @apply text-sm leading-6 text-foreground;
+  }
+
+  .practice-actions {
+    @apply grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-1;
+  }
+
+  .practice-actions a,
+  .practice-actions button {
+    @apply min-h-9 w-full;
+  }
+
+  .practice-state-panel {
+    @apply grid max-w-2xl gap-3;
+  }
+
   .form {
     @apply grid gap-4;
   }

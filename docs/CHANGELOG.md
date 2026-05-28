@@ -6,6 +6,34 @@
 
 ---
 
+## 2026-05-29 — Phase 04 complete
+
+**Type**: phase-completion
+**Author**: AI (context-update)
+**Triggered by**: PHASE_04 gate passed and committed
+
+### Changes
+- Added public practice read API returning published practice items without answer internals.
+- Added public validation API accepting `{item_id, answer}` and returning correctness feedback with safe regex execution and capped input length.
+- Added client-side practice trainer page (`/practice/:id`) with answer input, validation feedback states, code block rendering, streak/progress UI, and guest-first flow.
+- Added versioned `localStorage` guest progress store for attempts, streak, solved state, and migration-safe reads/writes.
+- Added frontend practice API helpers, TanStack Query keys, and shared practice/validation types.
+- Added backend and frontend test coverage for practice reads, draft-task exclusion, answer-internal leakage prevention, validation correctness, and trainer interactions.
+
+### Affected Phases
+- None (additive change)
+
+### Contract Updates
+- Added `GET /api/v1/public/practice/{task_id}`: published-only practice items without `expected_value`; draft tasks return 404.
+- Added `POST /api/v1/public/validate`: `{item_id, answer}` → `{correct, expected_value?, explanation_html?}`; input length capped, regex hard-timeout enforced.
+- Added interface contracts: `PublicPracticeItem`, `PracticeValidationRequest`, `PracticeValidationResponse`, `GuestProgressAttempt`, `GuestProgressState`, `PracticeTrainerState`.
+- No new persistent data, DB migrations, or environment variables.
+
+### Notes
+Guest progress is browser-owned and stored in a versioned `localStorage` schema (v1). Server-side `user_attempts` persistence is reserved for Phase 05. Validation runtime never logs raw answers — only IDs and metadata.
+
+---
+
 ## 2026-05-28 — Phase 03 complete
 
 **Type**: phase-completion

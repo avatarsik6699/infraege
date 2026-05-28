@@ -96,3 +96,32 @@ class PublicTaskDetail(PublicTaskSummary):
     asset_manifest: list[AssetManifestItem] = Field(alias="assetManifest")
     metadata: dict[str, Any]
     practice: list[PublicPracticePreview]
+
+
+class PublicPracticeItem(BaseModel):
+    id: UUID
+    task_id: UUID = Field(alias="taskId")
+    task_slug: str = Field(alias="taskSlug")
+    task_title: str = Field(alias="taskTitle")
+    ege_number: int = Field(alias="egeNumber")
+    position: int
+    year: int | None
+    prompt_html: str = Field(alias="promptHtml")
+    code_block: CodeBlock | None = Field(alias="codeBlock")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class PracticeValidationRequest(BaseModel):
+    item_id: UUID = Field(alias="itemId")
+    answer: str = Field(min_length=1, max_length=200)
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class PracticeValidationResponse(BaseModel):
+    correct: bool
+    expected_value: str | None = Field(default=None, alias="expectedValue")
+    explanation_html: str | None = Field(default=None, alias="explanationHtml")
+
+    model_config = ConfigDict(populate_by_name=True)

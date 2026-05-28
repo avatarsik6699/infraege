@@ -24,8 +24,13 @@ function todayIso(): string {
 	return new Date().toISOString().slice(0, 10);
 }
 
+function nowIso(): string {
+	return new Date().toISOString();
+}
+
 export const date = {
 	formatDate,
 	formatDateTime,
+	nowIso,
 	todayIso,
 } as const;

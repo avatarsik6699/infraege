@@ -191,5 +191,5 @@ feat(phase-03): public catalog and SSR theory pages
 - [x] `docs/CONTEXT.md` updated — run `/context-update 03`
 - [x] `docs/STATE.md` phase row updated to `✅ done`
 - [x] `docs/CHANGELOG.md` entry added (if contracts changed)
-- [ ] Committed atomically on `feat/phase-03` branch
-- [ ] Tag created after merge to develop: `git tag -a v0.03.0 -m "Phase 03: Public Catalog + SSR Theory"`
+- [x] Committed atomically on `feat/phase-03` branch
+- [x] Tag created after merge to develop: `git tag -a v0.03.0 -m "Phase 03: Public Catalog + SSR Theory"`

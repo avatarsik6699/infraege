@@ -191,6 +191,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/practice/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Public Practice */
+        get: operations["get_public_practice_api_v1_public_practice__task_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate Public Practice Answer */
+        post: operations["validate_public_practice_answer_api_v1_public_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -210,6 +244,15 @@ export interface components {
             /** Optimized Path */
             optimized_path?: string | null;
         };
+        /** CodeBlock */
+        CodeBlock: {
+            /** Language */
+            language: string;
+            /** Title */
+            title?: string | null;
+            /** Code */
+            code: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -224,6 +267,51 @@ export interface components {
             email: string;
             /** Password */
             password: string;
+        };
+        /** PracticeValidationRequest */
+        PracticeValidationRequest: {
+            /**
+             * Itemid
+             * Format: uuid
+             */
+            itemId: string;
+            /** Answer */
+            answer: string;
+        };
+        /** PracticeValidationResponse */
+        PracticeValidationResponse: {
+            /** Correct */
+            correct: boolean;
+            /** Expectedvalue */
+            expectedValue?: string | null;
+            /** Explanationhtml */
+            explanationHtml?: string | null;
+        };
+        /** PublicPracticeItem */
+        PublicPracticeItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Taskid
+             * Format: uuid
+             */
+            taskId: string;
+            /** Taskslug */
+            taskSlug: string;
+            /** Tasktitle */
+            taskTitle: string;
+            /** Egenumber */
+            egeNumber: number;
+            /** Position */
+            position: number;
+            /** Year */
+            year: number | null;
+            /** Prompthtml */
+            promptHtml: string;
+            codeBlock: components["schemas"]["CodeBlock"] | null;
         };
         /** PublicPracticePreview */
         PublicPracticePreview: {
@@ -679,6 +767,70 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicTaskDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_public_practice_api_v1_public_practice__task_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPracticeItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_public_practice_answer_api_v1_public_validate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PracticeValidationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PracticeValidationResponse"];
                 };
             };
             /** @description Validation Error */

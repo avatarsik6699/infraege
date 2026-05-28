@@ -13,3 +13,9 @@ export const taskQueryKeys = {
 		['tasks', 'public', 'catalog', filters ?? {}] as const,
 	publicDetail: (slug: string) => ['tasks', 'public', 'detail', slug] as const,
 };
+
+export const practiceQueryKeys = {
+	all: ['practice'] as const,
+	publicPractice: (taskId: string) => ['practice', 'public', taskId] as const,
+	validate: ['practice', 'validate'] as const,
+};

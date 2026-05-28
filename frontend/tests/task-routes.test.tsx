@@ -70,7 +70,7 @@ describe('public task routes UI', () => {
 		const html = renderWithRouter(<TaskPage task={detail} />);
 		expect(html).toContain('Задание 1');
 		expect(html).toContain('href="#task-1"');
-		expect(html).toContain('/practice/33333333-3333-3333-3333-333333333333');
+		expect(html).toContain('/practice/11111111-1111-1111-1111-111111111111');
 		expect(html).not.toContain('<script>');
 	});
 

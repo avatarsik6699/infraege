@@ -68,7 +68,7 @@ export default function TaskPage({ task }: TaskPageProps) {
 					<span>{task.estimatedMinutes ?? 10} мин</span>
 					{hasPrimaryPractice ? (
 						<Button asChild>
-							<AppLink to={`/practice/${primaryPractice.id}`}>
+							<AppLink to={`/practice/${task.id}`}>
 								<Play aria-hidden='true' className='size-4' />К практике
 							</AppLink>
 						</Button>
@@ -100,7 +100,7 @@ export default function TaskPage({ task }: TaskPageProps) {
 						<p>{task.practice.length} заданий для тренировки</p>
 						{hasPrimaryPractice ? (
 							<Button asChild variant='outline'>
-								<AppLink to={`/practice/${primaryPractice.id}`}>Начать с первого</AppLink>
+								<AppLink to={`/practice/${task.id}`}>Начать с первого</AppLink>
 							</Button>
 						) : null}
 					</div>
