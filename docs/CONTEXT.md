@@ -5,14 +5,14 @@
   },
 
   "captured_at": "2026-05-28",
-  "phase_completed": "01",
-  "phase_in_progress": "02",
+  "phase_completed": "02",
+  "phase_in_progress": null,
 
   "product": {
     "name": "infraege",
     "production_domain": "infraege.ru",
     "spec_version": "v2.1",
-    "status": "phase_01_complete"
+    "status": "phase_02_complete"
   },
 
   "stack": {
@@ -27,7 +27,17 @@
     "AuthTokens",
     "RegisterRequest",
     "LoginRequest",
-    "HealthResponse"
+    "HealthResponse",
+    "tasks",
+    "practice_items",
+    "TaskDifficulty",
+    "ContentStatus",
+    "Task",
+    "PracticeItem",
+    "CodeBlock",
+    "AssetManifestItem",
+    "ContentTaskDocument",
+    "ContentValidationError"
   ],
 
   "planned_contract": {
@@ -91,6 +101,24 @@
     }
   ],
 
+  "cli_contracts_active": [
+    {
+      "command": "uv run python -m app.content check",
+      "contract": "Dry-run validation of repository-authored content without database writes."
+    },
+    {
+      "command": "uv run python -m app.content import",
+      "contract": "Validate, render, sanitize, prepare assets, and upsert task/practice content into the database."
+    }
+  ],
+
+  "content_source_active": {
+    "task_files": "content/tasks/ege-01.md through content/tasks/ege-27.md",
+    "asset_dirs": "content/assets/ege-01/ through content/assets/ege-27/",
+    "source_of_truth": "repository Markdown/frontmatter and local assets",
+    "validation_errors": "Content validation errors include source file path and field path."
+  },
+
   "db_schema": {
     "tables": [
       {
@@ -107,10 +135,52 @@
           "updated_at TIMESTAMPTZ NOT NULL DEFAULT now()"
         ],
         "notes": "Requires PostgreSQL citext extension and user_role enum with user/admin values."
+      },
+      {
+        "name": "tasks",
+        "columns": [
+          "id UUID PRIMARY KEY",
+          "ege_number SMALLINT UNIQUE NOT NULL",
+          "slug VARCHAR(120) UNIQUE NOT NULL",
+          "title VARCHAR(200) NOT NULL",
+          "summary TEXT",
+          "difficulty task_difficulty NOT NULL",
+          "estimated_minutes SMALLINT",
+          "theory_html TEXT NOT NULL",
+          "theory_toc JSONB NOT NULL DEFAULT '[]'",
+          "asset_manifest JSONB NOT NULL DEFAULT '[]'",
+          "metadata JSONB NOT NULL DEFAULT '{}'",
+          "status content_status NOT NULL DEFAULT 'draft'",
+          "source_path VARCHAR(300) NOT NULL",
+          "source_hash CHAR(64) NOT NULL",
+          "published_at TIMESTAMPTZ",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT now()",
+          "updated_at TIMESTAMPTZ NOT NULL DEFAULT now()"
+        ],
+        "notes": "Requires task_difficulty enum with basic/medium/high values and content_status enum with draft/published values."
+      },
+      {
+        "name": "practice_items",
+        "columns": [
+          "id UUID PRIMARY KEY",
+          "task_id UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE",
+          "source_key VARCHAR(80) NOT NULL",
+          "position SMALLINT NOT NULL DEFAULT 0",
+          "year SMALLINT",
+          "prompt_html TEXT NOT NULL",
+          "code_block JSONB",
+          "answer_pattern VARCHAR(200) NOT NULL",
+          "expected_value VARCHAR(80) NOT NULL",
+          "explanation_html TEXT",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT now()",
+          "updated_at TIMESTAMPTZ NOT NULL DEFAULT now()",
+          "UNIQUE(task_id, source_key)"
+        ],
+        "notes": "Practice rows are imported from repository frontmatter and cascade when their parent task is deleted."
       }
     ],
     "source": "alembic",
-    "current_head": "0001_users_table"
+    "current_head": "0002_content_model"
   },
 
   "ui_pages_active": [
@@ -151,5 +221,5 @@
 
   "db_seeds": {},
 
-  "notes": "Phase 01 complete. Added runnable foundation, health endpoint, auth shell, users persistence, route placeholders, design tokens, Docker Compose development stack, and Phase 01 environment contract."
+  "notes": "Phase 02 complete. Added task-first content persistence, repository Markdown/frontmatter source files, asset directories, validation/rendering/import tooling, and content CLI contracts."
 }

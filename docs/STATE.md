@@ -16,6 +16,7 @@
 | Phase    | Status     | Tag    | Gate | Impl By | Notes |
 |----------|------------|--------|------|---------|-------|
 | PHASE_01 | ✅ done | v0.01.0 | ✅ | 🤖 agent | Foundation, Auth Shell, Design Tokens |
+| PHASE_02 | ✅ done | v0.02.0 | ✅ | 🤖 agent | Content Model + Authoring Pipeline |
 
 <!-- Add new rows here via /phase-init N -->
 

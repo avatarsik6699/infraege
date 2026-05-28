@@ -8,7 +8,7 @@
 |-------|-------|
 | Phase | `01` |
 | Title | Foundation, Auth Shell, Design Tokens |
-| Status | `⏳ pending` |
+| Status | `✅ done` |
 | Tag | `v0.01.0` |
 | Depends on | None |
 
@@ -302,12 +302,12 @@ feat(phase-01): foundation, auth shell, and design tokens
 
 ## Post-Phase Checklist
 
-- [ ] All Scope checkboxes checked (or deferred in Architect Review Notes)
-- [ ] `docs/PHASE_01_NOTES.md` complete — agent execution memory recorded
-- [ ] All automated gate checks green
-- [ ] All architect review notes resolved
-- [ ] `docs/CONTEXT.md` updated — run `/context-update 01`
-- [ ] `docs/STATE.md` phase row updated to `✅ done`
-- [ ] `docs/CHANGELOG.md` entry added (if contracts changed)
-- [ ] Committed atomically on `feat/phase-01` branch
-- [ ] Tag created after merge to develop: `git tag -a v0.01.0 -m "Phase 01: Foundation, Auth Shell, Design Tokens"`
+- [x] All Scope checkboxes checked (or deferred in Architect Review Notes)
+- [x] `docs/PHASE_01_NOTES.md` complete — agent execution memory recorded
+- [x] All automated gate checks green
+- [x] All architect review notes resolved
+- [x] `docs/CONTEXT.md` updated — run `/context-update 01`
+- [x] `docs/STATE.md` phase row updated to `✅ done`
+- [x] `docs/CHANGELOG.md` entry added (if contracts changed)
+- [x] Committed atomically on `feat/phase-01` branch
+- [x] Merged to `main`; phase tag recorded as `v0.01.0`

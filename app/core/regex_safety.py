@@ -12,13 +12,9 @@ def ensure_safe_pattern(pattern: str) -> None:
     if len(pattern) > 200:
         raise UnsafeRegexPattern("Pattern is too long")
 
-    deny_tokens = [
-        r"(.*)+",
-        r"(.+)+",
-        r"(\\w+)+",
-        r"(\\d+)+",
-    ]
-    if any(token in pattern for token in deny_tokens):
+    deny_tokens = [r"(.*)+", r"(.+)+", r"(\w+)+", r"(\d+)+"]
+    nested_quantifier = re.compile(r"\((?:[^()\\]|\\.)*[+*](?:[^()\\]|\\.)*\)[+*{]")
+    if any(token in pattern for token in deny_tokens) or nested_quantifier.search(pattern):
         raise UnsafeRegexPattern("Pattern contains potentially catastrophic nested quantifiers")
 
     try:

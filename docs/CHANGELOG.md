@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-05-28 — Phase 02 complete
+
+**Type**: phase-completion
+**Author**: AI (context-update)
+**Triggered by**: PHASE_02 gate passed
+
+### Changes
+- Added task-first persisted content models for `tasks` and `practice_items`.
+- Added repository-authored Markdown/frontmatter content skeletons for all 27 EGE tasks plus matching local asset directories.
+- Added content validation, Markdown rendering, HTML sanitization, asset manifest preparation, and CLI import tooling.
+
+### Affected Phases
+- None (additive change)
+
+### Contract Updates
+- Added `tasks` and `practice_items` tables with source audit fields, imported HTML fields, JSONB metadata/manifests, and cascading practice-item ownership.
+- Added `task_difficulty` and `content_status` enum contracts.
+- Added active CLI contracts for `uv run python -m app.content check` and `uv run python -m app.content import`.
+- Set Alembic current head to `0002_content_model`.
+
+### Notes
+Content import remains intentionally CLI-only for MVP; no HTTP import endpoint or preview UI was added.
+
 ## 2026-05-28 — Phase 01 complete
 
 **Type**: phase-completion

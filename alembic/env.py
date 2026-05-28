@@ -4,6 +4,7 @@ from logging.config import fileConfig
 
 from sqlalchemy.ext.asyncio import create_async_engine
 
+import app.modules.tasks  # noqa: F401
 import app.modules.users  # noqa: F401
 from alembic import context
 from app.db.base import Base
