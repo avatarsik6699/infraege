@@ -278,12 +278,12 @@ feat(phase-07): production readiness — nginx/tls, monitoring, security, analyt
 
 ## Post-Phase Checklist
 
-- [ ] All Scope checkboxes checked (or deferred in Architect Review Notes)
-- [ ] `docs/PHASE_07_NOTES.md` complete — agent execution memory recorded
-- [ ] All automated gate checks green
-- [ ] All architect review notes resolved
-- [ ] `docs/CONTEXT.md` updated — run `/context-update 07`
-- [ ] `docs/STATE.md` phase row updated to `✅ done`
-- [ ] `docs/CHANGELOG.md` entry added (if contracts changed)
-- [ ] Committed atomically on `feat/phase-07` branch
-- [ ] Tag created after merge to develop: `git tag -a v0.07.0 -m "Phase 07: Production Readiness"`
+- [x] All Scope checkboxes checked (or deferred in Architect Review Notes)
+- [x] `docs/PHASE_07_NOTES.md` complete — agent execution memory recorded
+- [x] All automated gate checks green
+- [x] All architect review notes resolved
+- [x] `docs/CONTEXT.md` updated — run `/context-update 07`
+- [x] `docs/STATE.md` phase row updated to `✅ done`
+- [x] `docs/CHANGELOG.md` entry added (if contracts changed)
+- [x] Committed atomically on `feat/phase-07` branch
+- [x] Tag created after merge to develop: `git tag -a v0.07.0 -m "Phase 07: Production Readiness"`
