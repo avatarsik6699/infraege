@@ -1,7 +1,9 @@
 from app.seeders.base import BaseSeeder
+from app.seeders.feedback import FeedbackSeeder
+from app.seeders.users import UserSeeder
 
-# Register project seeders here. The list order is the execution order.
-ALL_SEEDERS: list[type[BaseSeeder]] = []
-REFERENCE_SEEDERS: list[str] = []
+# Execution order matters: users must exist before feedback (no FK, but logical dependency).
+ALL_SEEDERS: list[type[BaseSeeder]] = [UserSeeder, FeedbackSeeder]
+REFERENCE_SEEDERS: list[str] = ["users", "feedback"]
 
-__all__ = ["ALL_SEEDERS", "BaseSeeder", "REFERENCE_SEEDERS"]
+__all__ = ["ALL_SEEDERS", "BaseSeeder", "FeedbackSeeder", "REFERENCE_SEEDERS", "UserSeeder"]

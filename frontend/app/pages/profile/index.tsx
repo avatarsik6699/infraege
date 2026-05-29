@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import { useDeleteAccountMutation, useMe, useSessionSummary } from '@shared/api/auth';
+import { useDeleteAccountMutation, useLogoutMutation, useMe, useSessionSummary } from '@shared/api/auth';
 import { progressQueryKeys } from '@shared/api/keys';
 import { AppLink } from '@shared/ui/app-link';
 import { Button } from '@shared/ui/button';
 
 import { useProgressMeQuery } from '@entities/user/api/user-queries';
-import type { ProfileMe, ProfileStats, RecentActivity, WeakTask } from '@entities/user/model/user.types';
+import type { ProfileMe, ProfileStats, RecentActivity, UserOut, WeakTask } from '@entities/user/model/user.types';
 
 function StatTile({ label, value }: { label: string; value: string | number }) {
 	return (
@@ -106,13 +106,19 @@ function DeleteAccountModal({ onClose, onConfirm, isPending }: { onClose: () => 
 	);
 }
 
-function ProfileContent({ data }: { data: ProfileMe }) {
+function ProfileContent({ data, meData }: { data: ProfileMe; meData?: UserOut }) {
 	const navigate = useNavigate();
 	const deleteAccountMutation = useDeleteAccountMutation();
+	const logoutMutation = useLogoutMutation();
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 	const handleDelete = async () => {
 		await deleteAccountMutation.mutateAsync();
+		navigate('/', { replace: true });
+	};
+
+	const handleLogout = async () => {
+		await logoutMutation.mutateAsync();
 		navigate('/', { replace: true });
 	};
 
@@ -143,9 +149,14 @@ function ProfileContent({ data }: { data: ProfileMe }) {
 				<h2 id='account-heading' className='text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-3'>
 					Аккаунт
 				</h2>
-				<Button variant='destructive' onClick={() => setShowDeleteModal(true)}>
-					Удалить аккаунт
-				</Button>
+				<div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+					<Button variant='outline' onClick={() => void handleLogout()} disabled={logoutMutation.isPending}>
+						{logoutMutation.isPending ? 'Выход...' : 'Выйти'}
+					</Button>
+					<Button variant='destructive' onClick={() => setShowDeleteModal(true)}>
+						Удалить аккаунт
+					</Button>
+				</div>
 			</section>
 
 			{showDeleteModal ? (
@@ -184,7 +195,14 @@ export default function ProfilePage() {
 				<header className='space-y-1'>
 					<h1 className='text-2xl font-semibold tracking-tight'>Профиль</h1>
 					{meQuery.data ? (
-						<p className='text-sm text-muted-foreground'>{meQuery.data.email}</p>
+						<div className='flex flex-wrap items-center gap-2'>
+							<p className='text-sm text-muted-foreground'>{meQuery.data.email}</p>
+							{meQuery.data.role === 'admin' && (
+								<span className='inline-flex items-center rounded-full border border-border px-2 py-0.5 text-xs font-semibold'>
+									Admin
+								</span>
+							)}
+						</div>
 					) : null}
 				</header>
 
@@ -193,7 +211,7 @@ export default function ProfilePage() {
 				) : progressQuery.isError ? (
 					<p className='text-sm text-destructive'>Не удалось загрузить статистику.</p>
 				) : progressQuery.data ? (
-					<ProfileContent data={progressQuery.data} />
+					<ProfileContent data={progressQuery.data} meData={meQuery.data} />
 				) : null}
 			</div>
 		</main>

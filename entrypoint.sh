@@ -4,8 +4,12 @@ set -e
 echo "Running Alembic migrations..."
 uv run alembic upgrade head
 
-echo "Running database seeders..."
-uv run python scripts/seed.py
+if [ "${APP_ENV:-development}" = "development" ] && [ "${SEED_ON_BOOT:-true}" = "true" ]; then
+    echo "Running database seeders (APP_ENV=${APP_ENV:-development}, SEED_ON_BOOT=${SEED_ON_BOOT:-true})..."
+    uv run python scripts/seed.py
+else
+    echo "Skipping seeders (APP_ENV=${APP_ENV:-development}, SEED_ON_BOOT=${SEED_ON_BOOT:-true})."
+fi
 
 echo "Importing repository content..."
 uv run python -m app.content import

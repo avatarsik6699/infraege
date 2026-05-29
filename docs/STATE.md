@@ -20,6 +20,7 @@
 | PHASE_03 | ✅ done | v0.03.0 | ✅ | 🤖 agent | Public Catalog + SSR Theory |
 | PHASE_04 | ✅ done | v0.04.0 | ✅ | 🤖 agent | Practice Trainer + Guest Progress |
 | PHASE_05 | ✅ done | v0.05.0 | ✅ | 🤖 agent | Account/Profile + Sync |
+| PHASE_06 | ⏳ pending | v0.06.0 | ⬜ | — | Feedback, Legal, SEO Hardening |
 
 <!-- Add new rows here via /phase-init N -->
 

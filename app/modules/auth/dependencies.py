@@ -56,3 +56,9 @@ def require_role(
         return current_user
 
     return dependency
+
+
+async def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != UserRole.admin:
+        raise InsufficientRole()
+    return current_user

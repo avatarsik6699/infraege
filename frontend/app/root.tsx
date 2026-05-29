@@ -33,9 +33,12 @@ export default function App() {
 				<Links />
 			</head>
 			<body>
+				<a href='#main-content' className='skip-link'>
+					Перейти к основному содержимому
+				</a>
 				<AppProvider>
 					<AppTopBar />
-					<div className='pt-20'>
+					<div id='main-content' tabIndex={-1} className='outline-none'>
 						<Outlet />
 					</div>
 				</AppProvider>
@@ -65,7 +68,6 @@ export function ErrorBoundary() {
 			</head>
 			<body>
 				<AppProvider>
-					<AppTopBar />
 					<main className='shell'>
 						<ErrorState title='Ошибка приложения' error={error} />
 					</main>

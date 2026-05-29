@@ -48,6 +48,20 @@ describe('LoginForm', () => {
 		const html = wrapWithDataRouter(<LoginForm />);
 		expect(html).toContain('/register');
 	});
+
+	// Guards against credential-field regressions: if input types change, browsers
+	// may send different payloads (e.g. autocomplete stops working for password fields).
+	it('email input has type=email and password input has type=password', () => {
+		const html = wrapWithDataRouter(<LoginForm />);
+		expect(html).toMatch(/id="login-email"[^>]*type="email"|type="email"[^>]*id="login-email"/);
+		expect(html).toMatch(/id="login-password"[^>]*type="password"|type="password"[^>]*id="login-password"/);
+	});
+
+	it('submit button is present and labelled for login action', () => {
+		const html = wrapWithDataRouter(<LoginForm />);
+		expect(html).toContain('type="submit"');
+		expect(html).toMatch(/Войти/);
+	});
 });
 
 describe('RegisterForm', () => {

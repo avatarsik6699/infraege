@@ -1,5 +1,6 @@
 import { ArrowRight, BookOpen, ListFilter, Play } from 'lucide-react';
 
+import { FeedbackForm } from '@features/feedback/feedback-form';
 import { AppLink } from '@shared/ui/app-link';
 import { Button } from '@shared/ui/button';
 
@@ -22,9 +23,9 @@ export default function HomePage() {
 						</AppLink>
 					</Button>
 					<Button asChild variant='outline' size='lg'>
-						<AppLink to='/practice/demo'>
+						<AppLink to='/topics'>
 							<Play aria-hidden='true' className='size-4' />
-							Тренажер
+							Начать тренировку
 						</AppLink>
 					</Button>
 				</div>
@@ -37,16 +38,22 @@ export default function HomePage() {
 						</span>
 						<ArrowRight aria-hidden='true' className='size-4' />
 					</AppLink>
-					<AppLink to='/practice/demo' className='home-quick-link'>
+					<AppLink to='/topics' className='home-quick-link'>
 						<Play aria-hidden='true' className='size-5' />
 						<span>
 							<strong>Практика</strong>
-							<small>Вход в тренировочный сценарий без реализации новой логики</small>
+							<small>Откройте задание и нажмите «К практике»</small>
 						</span>
 						<ArrowRight aria-hidden='true' className='size-4' />
 					</AppLink>
 				</section>
 			</header>
+
+		<section className='max-w-2xl border-t border-border pt-12 pb-16' aria-labelledby='feedback-heading'>
+			<h2 id='feedback-heading' className='text-xl font-semibold mb-1'>Обратная связь</h2>
+			<p className='text-sm text-muted-foreground mb-6'>Нашли ошибку или хотите что-то улучшить? Напишите нам.</p>
+			<FeedbackForm />
+		</section>
 		</main>
 	);
 }

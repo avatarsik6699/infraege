@@ -20,3 +20,8 @@ export const practiceQueryKeys = {
 	publicPractice: (taskId: string) => ['practice', 'public', taskId] as const,
 	validate: ['practice', 'validate'] as const,
 };
+
+export const feedbackQueryKeys = {
+	adminList: (filters?: { page?: number; perPage?: number; status?: string }) =>
+		['feedback', 'admin', 'list', filters ?? {}] as const,
+};

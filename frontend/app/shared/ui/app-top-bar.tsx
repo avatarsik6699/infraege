@@ -1,118 +1,127 @@
-import { useMemo, useState } from 'react';
-import { Link, useLocation } from 'react-router';
+import { User } from 'lucide-react';
+import { useLocation } from 'react-router';
 
-import { useLogoutMutation, useSessionSummary } from '@shared/api/auth';
-import { clipboard } from '@shared/lib/clipboard';
-import { isNonEmptyString } from '@shared/lib/type-guards';
-import { Button } from '@shared/ui/button';
-import { ThemeToggle } from '@shared/ui/theme-toggle';
+import { useSessionSummary } from '@shared/api/auth';
 
-function maskToken(value: string): string {
-	if (value.length <= 12) return '••••••';
-	return `${value.slice(0, 8)}••••••${value.slice(-4)}`;
+import { AppLink } from './app-link';
+
+const HIDDEN_ROUTES = new Set(['/login', '/register']);
+
+function Logo() {
+	return (
+		<AppLink
+			to='/'
+			aria-label='infraege — на главную'
+			style={{
+				fontFamily: 'var(--serif)',
+				fontStyle: 'italic',
+				fontWeight: 500,
+				fontSize: 20,
+				letterSpacing: '-0.025em',
+				color: 'var(--ink)',
+				textDecoration: 'none',
+				lineHeight: 1,
+			}}
+		>
+			learn<span style={{ color: 'var(--coral)' }}>info</span>ege
+		</AppLink>
+	);
 }
 
+const NAV_LINKS = [
+	{ to: '/topics', label: 'Темы', matchPrefixes: ['/topics', '/tasks', '/practice'] },
+];
+
 export function AppTopBar() {
-	const { pathname } = useLocation();
-	const { accessToken, isAuthenticated, meQuery } = useSessionSummary();
-	const logoutMutation = useLogoutMutation();
-	const [isTokenVisible, setIsTokenVisible] = useState(false);
-	const [copyState, setCopyState] = useState<'idle' | 'success' | 'error'>('idle');
+	const location = useLocation();
+	const { isAuthenticated, meQuery } = useSessionSummary();
+	const isAdmin = meQuery.data?.role === 'admin';
 
-	const isCompact = pathname.startsWith('/login');
-	const tokenValue = isNonEmptyString(accessToken) ? `Bearer ${accessToken}` : '';
-	const tokenPreview = useMemo(() => {
-		if (!isNonEmptyString(accessToken)) return '';
-		return isTokenVisible ? tokenValue : maskToken(tokenValue);
-	}, [accessToken, isTokenVisible, tokenValue]);
+	if (HIDDEN_ROUTES.has(location.pathname)) return null;
 
-	const onCopyToken = async () => {
-		if (!isNonEmptyString(tokenValue)) return;
-		const didCopy = await clipboard.writeText(tokenValue);
-		if (didCopy) {
-			setCopyState('success');
-			return;
-		}
-
-		setCopyState('error');
-	};
+	const visibleNavLinks = [
+		...NAV_LINKS,
+		...(isAdmin ? [{ to: '/admin/feedback', label: 'Админ', matchPrefixes: ['/admin'] }] : []),
+	];
 
 	return (
-		<header className='topbar border-b border-border/60 bg-background/95 backdrop-blur'>
-			<div className='topbar-inner'>
-				<div className='flex items-center gap-3'>
-					<Link to='/' className='text-sm font-semibold tracking-tight'>
-						infraege
-					</Link>
-					<ThemeToggle />
-				</div>
-				{isCompact ? null : (
-					<div className='flex flex-wrap items-center justify-end gap-2'>
-						{!isAuthenticated ? (
-							<>
-								<span className='text-xs text-muted-foreground'>Не авторизован</span>
-								<Button asChild size='sm' variant='outline'>
-									<Link to='/login'>Войти</Link>
-								</Button>
-								<Button asChild size='sm' variant='ghost'>
-									<Link to='/register'>Регистрация</Link>
-								</Button>
-							</>
-						) : (
-							<>
-								{meQuery.isLoading ? (
-									<span className='text-xs text-muted-foreground'>Загрузка профиля...</span>
-								) : meQuery.isError ? (
-									<>
-										<span className='text-xs text-destructive'>Не удалось загрузить профиль</span>
-										<Button type='button' size='sm' variant='ghost' onClick={() => void meQuery.refetch()}>
-											Повторить
-										</Button>
-									</>
-								) : (
-									<span className='text-xs text-muted-foreground'>
-										{meQuery.data?.email ?? 'неизвестно'} ·{' '}
-										{meQuery.data?.role === 'admin' ? 'админ' : 'пользователь'} ·{' '}
-										{meQuery.data?.is_active === true ? 'активен' : 'неактивен'}
-									</span>
-								)}
-								<Button asChild size='sm' variant='outline'>
-									<Link to='/dashboard'>Кабинет</Link>
-								</Button>
-								<div className='flex items-center gap-2 rounded-md border border-border px-2 py-1'>
-									<span className='text-xs text-muted-foreground'>API токен</span>
-									<code className='max-w-[220px] truncate text-xs'>{tokenPreview}</code>
-									<Button
-										type='button'
-										size='sm'
-										variant='ghost'
-										onClick={() => setIsTokenVisible(current => !current)}
-									>
-										{isTokenVisible ? 'Скрыть' : 'Показать'}
-									</Button>
-									<Button type='button' size='sm' variant='ghost' onClick={() => void onCopyToken()}>
-										Копировать
-									</Button>
-								</div>
-								<span className='text-xs text-muted-foreground'>Для /docs: Bearer &lt;access_token&gt;</span>
-								{copyState === 'success' ? (
-									<span className='text-xs text-emerald-600'>Скопировано</span>
-								) : null}
-								{copyState === 'error' ? <span className='text-xs text-destructive'>Ошибка копирования</span> : null}
-								<Button
-									type='button'
-									size='sm'
-									variant='ghost'
-									disabled={logoutMutation.isPending}
-									onClick={() => logoutMutation.mutate()}
-								>
-									Выйти
-								</Button>
-							</>
-						)}
-					</div>
-				)}
-			</div>
+		<header
+			className='px-3 py-2 md:px-4 md:py-3'
+			style={{
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'space-between',
+				borderBottom: '1px solid var(--line)',
+				background: 'var(--paper)',
+				position: 'sticky',
+				top: 0,
+				zIndex: 5,
+			}}
+		>
+			<Logo />
+
+			<nav className='flex items-center gap-4 md:gap-6' aria-label='Основная навигация'>
+				{visibleNavLinks.map(({ to, label, matchPrefixes }) => {
+					const isActive = matchPrefixes.some(p => location.pathname.startsWith(p));
+					return (
+						<AppLink
+							key={to}
+							to={to}
+							style={{
+								fontFamily: 'var(--sans)',
+								fontSize: '13.5px',
+								fontWeight: 500,
+								color: isActive ? 'var(--ink)' : 'var(--ink-3)',
+								textDecoration: 'none',
+								transition: 'color 0.12s',
+							}}
+						>
+							{label}
+						</AppLink>
+					);
+				})}
+			</nav>
+
+			{isAuthenticated ? (
+				<AppLink
+					to='/profile'
+					aria-label='Профиль'
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						width: 40,
+						height: 40,
+						borderRadius: 12,
+						background: 'transparent',
+						color: 'var(--ink)',
+					}}
+				>
+					<User size={20} strokeWidth={1.8} />
+				</AppLink>
+			) : (
+				<AppLink
+					to='/login'
+					style={{
+						display: 'inline-flex',
+						alignItems: 'center',
+						height: 36,
+						padding: '0 14px',
+						borderRadius: 999,
+						border: '1px solid var(--line-strong)',
+						background: 'transparent',
+						fontFamily: 'var(--sans)',
+						fontSize: 13,
+						fontWeight: 600,
+						color: 'var(--ink)',
+						textDecoration: 'none',
+						letterSpacing: '-0.005em',
+						whiteSpace: 'nowrap',
+					}}
+				>
+					Войти
+				</AppLink>
+			)}
 		</header>
 	);
 }

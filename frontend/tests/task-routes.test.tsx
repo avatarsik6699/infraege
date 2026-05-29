@@ -51,7 +51,7 @@ describe('public task routes UI', () => {
 		const html = renderWithRouter(<HomePage />);
 		expect(html).toContain('Каталог заданий');
 		expect(html).toContain('/topics');
-		expect(html).toContain('/practice/demo');
+		expect(html).not.toContain('/practice/demo');
 	});
 
 	it('filters catalog tasks by Russian search and difficulty', () => {

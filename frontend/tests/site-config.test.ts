@@ -34,4 +34,35 @@ describe('site output generators', () => {
 		expect(robots).toContain('Allow: /');
 		expect(robots).toContain('Sitemap: https://example.com/sitemap.xml');
 	});
+
+	it('buildAllIndexableRoutes includes task slugs', () => {
+		const routes = JSON.parse(
+			runSiteConfigExpression("site.buildAllIndexableRoutes(['ege-01', 'ege-02', 'ege-27'])")
+		) as string[];
+
+		expect(routes).toContain('/');
+		expect(routes).toContain('/topics');
+		expect(routes).toContain('/privacy');
+		expect(routes).toContain('/terms');
+		expect(routes).toContain('/tasks/ege-01');
+		expect(routes).toContain('/tasks/ege-02');
+		expect(routes).toContain('/tasks/ege-27');
+	});
+
+	it('buildAllIndexableRoutes with no task slugs returns base routes', () => {
+		const routes = JSON.parse(runSiteConfigExpression('site.buildAllIndexableRoutes()')) as string[];
+
+		expect(routes).toEqual(['/', '/topics', '/privacy', '/terms']);
+	});
+
+	it('sitemap with task slugs contains task URLs', () => {
+		const sitemap = JSON.parse(
+			runSiteConfigExpression(
+				"site.buildSitemapXml('https://infraege.ru', site.buildAllIndexableRoutes(['ege-01', 'ege-27']))"
+			)
+		) as string;
+
+		expect(sitemap).toContain('<loc>https://infraege.ru/tasks/ege-01</loc>');
+		expect(sitemap).toContain('<loc>https://infraege.ru/tasks/ege-27</loc>');
+	});
 });

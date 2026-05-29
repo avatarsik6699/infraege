@@ -260,10 +260,114 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit Feedback */
+        post: operations["submit_feedback_api_v1_public_feedback_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Feedback */
+        get: operations["list_feedback_api_v1_admin_feedback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/feedback/{report_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Feedback Status */
+        patch: operations["update_feedback_status_api_v1_admin_feedback__report_id__patch"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** FeedbackRequest */
+        FeedbackRequest: {
+            /** Page Url */
+            page_url: string;
+            /** Message */
+            message: string;
+            /** Honeypot */
+            honeypot?: string;
+        };
+        /** FeedbackResponse */
+        FeedbackResponse: {
+            /** Ok */
+            ok: boolean;
+        };
+        /** FeedbackStatus */
+        FeedbackStatus: "new" | "reviewed" | "archived";
+        /** FeedbackReportAdmin */
+        FeedbackReportAdmin: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Page Url */
+            page_url: string;
+            /** Message */
+            message: string;
+            /** Ip Hash */
+            ip_hash: string;
+            /** User Agent */
+            user_agent: string | null;
+            status: components["schemas"]["FeedbackStatus"];
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+        };
+        /** FeedbackStatusUpdate */
+        FeedbackStatusUpdate: {
+            status: components["schemas"]["FeedbackStatus"];
+        };
+        /** FeedbackListResponse */
+        FeedbackListResponse: {
+            /** Items */
+            items: components["schemas"]["FeedbackReportAdmin"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Per Page */
+            per_page: number;
+        };
         /** AssetManifestItem */
         AssetManifestItem: {
             /** Url */
@@ -1019,6 +1123,107 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProfileMe"];
+                };
+            };
+        };
+    };
+    submit_feedback_api_v1_public_feedback_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_feedback_api_v1_admin_feedback_get: {
+        parameters: {
+            query?: {
+                page?: number;
+                per_page?: number;
+                status?: components["schemas"]["FeedbackStatus"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_feedback_status_api_v1_admin_feedback__report_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FeedbackStatusUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeedbackReportAdmin"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

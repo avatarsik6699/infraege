@@ -1,21 +1,15 @@
-import { PlaceholderPage } from '@pages/placeholder';
+import { TermsPage } from '@pages/legal/terms-page';
 import { buildRouteMeta } from '@shared/lib/seo';
 
 export function meta() {
 	return buildRouteMeta({
 		pathname: '/terms',
-		title: 'Условия',
-		description: 'Условия использования infraege.',
+		title: 'Условия использования',
+		description: 'Условия использования образовательного сервиса infraege.',
 		profile: 'publicIndexable',
 	});
 }
 
 export default function TermsRoute() {
-	return (
-		<PlaceholderPage
-			kicker='Документы'
-			title='Условия использования'
-			description='Полные условия использования будут подготовлены в фазе юридических страниц.'
-		/>
-	);
+	return <TermsPage />;
 }

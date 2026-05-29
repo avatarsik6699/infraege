@@ -2,6 +2,10 @@ export const defaultSiteUrl = 'http://localhost:3000';
 export const defaultAppName = 'infraege';
 export const publicIndexableRoutes = ['/', '/topics', '/privacy', '/terms'];
 
+export function buildAllIndexableRoutes(taskSlugs = []) {
+	return [...publicIndexableRoutes, ...taskSlugs.map(slug => `/tasks/${slug}`)];
+}
+
 export function normalizeSiteUrl(value) {
 	try {
 		const url = new URL(value);
