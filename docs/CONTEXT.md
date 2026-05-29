@@ -5,14 +5,14 @@
   },
 
   "captured_at": "2026-05-29",
-  "phase_completed": "05",
+  "phase_completed": "06",
   "phase_in_progress": null,
 
   "product": {
     "name": "infraege",
     "production_domain": "infraege.ru",
     "spec_version": "v2.1",
-    "status": "phase_05_complete"
+    "status": "phase_06_complete"
   },
 
   "stack": {
@@ -57,7 +57,15 @@
     "WeakTask",
     "RecentActivity",
     "ProfileMe",
-    "PasswordStrength"
+    "PasswordStrength",
+    "FeedbackReport",
+    "FeedbackRepository",
+    "FeedbackRequest",
+    "FeedbackResponse",
+    "FeedbackReportAdmin",
+    "FeedbackStatusUpdate",
+    "FeedbackListResponse",
+    "FeedbackStatus"
   ],
 
   "planned_contract": {
@@ -160,6 +168,24 @@
       "path": "/api/v1/public/progress/me",
       "auth": "user",
       "contract": "{stats: ProfileStats, weakTasks: WeakTask[], recentActivity: RecentActivity[]}; weak tasks are bottom-5 by accuracy; recent activity is last 30 days grouped by date."
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/public/feedback",
+      "auth": "none",
+      "contract": "{page_url, message, honeypot?} → {ok: true}; honeypot must be empty string; Redis-backed rate-limit (default 5/minute); ip_hash=sha256(ip+FEEDBACK_IP_PEPPER) stored; no raw IP logged."
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/feedback",
+      "auth": "admin",
+      "contract": "{items: FeedbackReportAdmin[], total, page, per_page}; query params: ?page=1&per_page=20&status=new|reviewed|archived."
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/admin/feedback/{id}",
+      "auth": "admin",
+      "contract": "{status: feedback_status} → FeedbackReportAdmin; updates review status."
     }
   ],
 
@@ -252,10 +278,23 @@
           "UNIQUE(user_id, practice_item_id)"
         ],
         "notes": "Stores per-user practice attempt records. attempts_count increments on sync upsert; last_answered_at takes the later value on conflict. Cascades on user and practice_item deletion."
+      },
+      {
+        "name": "feedback_reports",
+        "columns": [
+          "id UUID PRIMARY KEY",
+          "page_url VARCHAR(500) NOT NULL",
+          "message TEXT NOT NULL",
+          "ip_hash CHAR(64) NOT NULL",
+          "user_agent VARCHAR(300)",
+          "status feedback_status NOT NULL DEFAULT 'new'",
+          "submitted_at TIMESTAMPTZ NOT NULL DEFAULT now()"
+        ],
+        "notes": "Requires feedback_status enum with new/reviewed/archived values. Raw IP addresses are never stored; ip_hash = sha256(ip + FEEDBACK_IP_PEPPER). No FK to users table."
       }
     ],
     "source": "alembic",
-    "current_head": "0003_user_attempts"
+    "current_head": "0004_feedback_reports"
   },
 
   "ui_pages_active": [
@@ -290,11 +329,13 @@
       "API_BASE_INTERNAL_URL",
       "VITE_API_BASE_URL",
       "VITE_PUBLIC_SITE_URL",
-      "VITE_PUBLIC_APP_NAME"
+      "VITE_PUBLIC_APP_NAME",
+      "FEEDBACK_IP_PEPPER",
+      "FEEDBACK_RATE_LIMIT"
     ]
   },
 
   "db_seeds": {},
 
-  "notes": "Phase 05 complete. Added user_attempts table, DELETE /auth/me, POST /progress/sync, GET /progress/me endpoints, completed login/register UI with password-strength meter, progress sync flow merging guest localStorage on auth, and /profile page with stats, weak-task list, activity chart, and account deletion."
+  "notes": "Phase 06 complete. Added feedback_reports table and feedback_status enum, POST /public/feedback with honeypot and Redis rate-limit, GET/PATCH /admin/feedback admin endpoints, feedback form UI with accessible honeypot, /privacy and /terms legal pages with real SSR content, /admin/feedback paginated admin table, sitemap task slugs, Open Graph metadata on all SSR routes, and Lighthouse/accessibility fixes (ARIA, skip-to-content, focus management, contrast, tap targets)."
 }

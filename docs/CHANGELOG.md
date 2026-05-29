@@ -6,6 +6,41 @@
 
 ---
 
+## 2026-05-29 — Phase 06 complete
+
+**Type**: phase-completion
+**Author**: AI (context-update)
+**Triggered by**: PHASE_06 gate passed and committed
+
+### Changes
+- Added `feedback_reports` table with `feedback_status` enum (`new | reviewed | archived`) and `sha256(ip + FEEDBACK_IP_PEPPER)` ip_hash; raw IPs are never stored.
+- Added `POST /api/v1/public/feedback` with honeypot field rejection, Redis-backed rate-limit (5/minute default), and message-length cap.
+- Added `GET /api/v1/admin/feedback` paginated list and `PATCH /api/v1/admin/feedback/{id}` status update, both protected by `require_admin` dependency.
+- Added feedback form feature component (`feedback-form.tsx`) with accessible honeypot, controlled textarea, and submit/loading/success/error states; wired into the header and nav for all authenticated users.
+- Added admin link/nav for users with admin role.
+- Replaced `/privacy` and `/terms` route stubs with real SSR 152-FZ privacy policy and terms-of-use pages.
+- Built `/admin/feedback` CSR page with paginated admin table, status chip, and PATCH status action.
+- Added task page slugs to sitemap and confirmed `robots.txt` Sitemap URL uses `VITE_PUBLIC_SITE_URL`.
+- Added `og:title`, `og:description`, `og:type` and canonical URL to all SSR route `meta()` exports.
+- Applied Lighthouse/accessibility fixes: ARIA roles for dynamic regions, keyboard focus management, skip-to-content link, colour-contrast audit, 44 px tap targets on mobile.
+- Added backend tests (feedback submit, honeypot rejection, rate-limit guard, admin list pagination, status patch, auth guard) and frontend unit + e2e tests.
+
+### Affected Phases
+- None (additive change)
+
+### Contract Updates
+- Added `feedback_reports` table (Alembic head: `0004_feedback_reports`).
+- Added `POST /api/v1/public/feedback`: `{page_url, message, honeypot?}` → `{ok: true}`; rate-limited; ip_hash stored.
+- Added `GET /api/v1/admin/feedback`: `{items: FeedbackReportAdmin[], total, page, per_page}`; admin-only.
+- Added `PATCH /api/v1/admin/feedback/{id}`: `{status: feedback_status}` → `FeedbackReportAdmin`; admin-only.
+- Added interface contracts: `FeedbackRequest`, `FeedbackResponse`, `FeedbackStatus`, `FeedbackReportAdmin`, `FeedbackStatusUpdate`, `FeedbackListResponse`.
+- Added env vars: `FEEDBACK_IP_PEPPER` (required), `FEEDBACK_RATE_LIMIT` (optional, default `5/minute`).
+
+### Notes
+Raw IP addresses are never stored — only a pepper-salted SHA-256 hash. Honeypot is a hidden field that must be empty; non-empty honeypot causes silent discard (returns 200 `{ok: true}` to avoid detection leakage, or 422 per impl choice — verify against live impl). Admin routes require `require_admin` FastAPI dependency; unauthenticated and non-admin requests are rejected with 401/403.
+
+---
+
 ## 2026-05-29 — Phase 05 complete
 
 **Type**: phase-completion
