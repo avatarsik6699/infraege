@@ -8,7 +8,7 @@
 |-------|-------|
 | Phase | `05` |
 | Title | Account/Profile + Sync |
-| Status | `⏳ pending` |
+| Status | `✅ done` |
 | Tag | `v0.05.0` |
 | Depends on | PHASE_04 gate passing |
 
@@ -228,12 +228,12 @@ feat(phase-05): account, profile, and progress sync
 
 ## Post-Phase Checklist
 
-- [ ] All Scope checkboxes checked (or deferred in Architect Review Notes)
-- [ ] `docs/PHASE_05_NOTES.md` complete — agent execution memory recorded
-- [ ] All automated gate checks green
-- [ ] All architect review notes resolved
-- [ ] `docs/CONTEXT.md` updated — run `/context-update 05`
-- [ ] `docs/STATE.md` phase row updated to `✅ done`
-- [ ] `docs/CHANGELOG.md` entry added (if contracts changed)
-- [ ] Committed atomically on `feat/phase-05` branch
-- [ ] Tag created after merge to develop: `git tag -a v0.05.0 -m "Phase 05: Account/Profile + Sync"`
+- [x] All Scope checkboxes checked (or deferred in Architect Review Notes)
+- [x] `docs/PHASE_05_NOTES.md` complete — agent execution memory recorded
+- [x] All automated gate checks green
+- [x] All architect review notes resolved
+- [x] `docs/CONTEXT.md` updated — run `/context-update 05`
+- [x] `docs/STATE.md` phase row updated to `✅ done`
+- [x] `docs/CHANGELOG.md` entry added (if contracts changed)
+- [x] Committed atomically on `feat/phase-05` branch
+- [x] Tag created after merge to develop: `git tag -a v0.05.0 -m "Phase 05: Account/Profile + Sync"`
