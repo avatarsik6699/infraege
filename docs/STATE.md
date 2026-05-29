@@ -21,6 +21,7 @@
 | PHASE_04 | ✅ done | v0.04.0 | ✅ | 🤖 agent | Practice Trainer + Guest Progress |
 | PHASE_05 | ✅ done | v0.05.0 | ✅ | 🤖 agent | Account/Profile + Sync |
 | PHASE_06 | ✅ done | v0.06.0 | ✅ | 🤖 agent | Feedback, Legal, SEO Hardening |
+| PHASE_07 | ⏳ pending | v0.07.0 | ⬜ | — | Production Readiness |
 
 <!-- Add new rows here via /phase-init N -->
 
