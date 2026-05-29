@@ -1,4 +1,4 @@
-import { PlaceholderPage } from '@pages/placeholder';
+import ProfilePage from '@pages/profile';
 import { buildRouteMeta } from '@shared/lib/seo';
 
 export function meta() {
@@ -11,13 +11,5 @@ export function meta() {
 }
 
 export default function ProfileRoute() {
-	return (
-		<PlaceholderPage
-			kicker='Аккаунт'
-			title='Профиль'
-			description='Статистика, слабые темы и синхронизация прогресса относятся к будущей фазе.'
-			ctaHref='/login'
-			ctaLabel='Войти'
-		/>
-	);
+	return <ProfilePage />;
 }

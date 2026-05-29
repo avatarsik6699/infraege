@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-05-29 — Phase 05 complete
+
+**Type**: phase-completion
+**Author**: AI (context-update)
+**Triggered by**: PHASE_05 gate passed and committed
+
+### Changes
+- Added `user_attempts` table with cascade constraints on user and practice-item deletion, ON CONFLICT upsert semantics for sync merging.
+- Added `DELETE /api/v1/public/auth/me` — authenticated account deletion with cascaded `user_attempts` removal.
+- Added `POST /api/v1/public/progress/sync` — bulk upsert of guest localStorage attempts into `user_attempts` (max 300 per request).
+- Added `GET /api/v1/public/progress/me` — profile stats, bottom-5 weak tasks by accuracy, and last-30-day activity heatmap data.
+- Completed `/login` and `/register` pages with split desktop layout, mobile layout, show/hide password toggle, 4-segment strength meter, 152-FZ consent checkbox, and "Решать как гость" CTA.
+- Added progress sync flow: after successful login/register, guest localStorage attempts are synced to server then cleared.
+- Built `/profile` page with stats tiles, weak-task list, recent-activity chart, sync status indicator, and account deletion with confirmation modal.
+- Added backend tests (DELETE /me cascade, sync idempotency, progress/me shape, auth guards) and frontend unit + e2e tests (login/register forms, sync hook, profile page states).
+
+### Affected Phases
+- None (additive change)
+
+### Contract Updates
+- Added `user_attempts` table (Alembic head: `0003_user_attempts`).
+- Added `DELETE /api/v1/public/auth/me`: 204 No Content; cascades user_attempts.
+- Added `POST /api/v1/public/progress/sync`: `{attempts: SyncAttemptItem[]}` → `{synced, updated}`; 300-attempt cap.
+- Added `GET /api/v1/public/progress/me`: `{stats: ProfileStats, weakTasks: WeakTask[], recentActivity: RecentActivity[]}`.
+- Added interface contracts: `UserAttempt`, `SyncAttemptItem`, `ProgressSyncRequest`, `ProgressSyncResponse`, `ProfileStats`, `WeakTask`, `RecentActivity`, `ProfileMe`, `PasswordStrength`.
+- No new environment variables.
+
+### Notes
+Progress sync is idempotent: re-sending the same attempts increments `attempts_count` and advances `last_answered_at` rather than duplicating rows. Account deletion is irreversible and cascades all user data at the DB layer with no soft-delete.
+
+---
+
 ## 2026-05-29 — Phase 04 complete
 
 **Type**: phase-completion

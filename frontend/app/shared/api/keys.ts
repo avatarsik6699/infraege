@@ -5,6 +5,7 @@ export const authQueryKeys = {
 
 export const progressQueryKeys = {
 	summary: ['progress', 'summary'] as const,
+	me: ['progress', 'me'] as const,
 };
 
 export const taskQueryKeys = {

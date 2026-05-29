@@ -35,7 +35,7 @@ from app.db.session import get_db  # noqa: E402
 from app.main import app  # noqa: E402
 from app.modules.auth.utils import create_access_token, hash_password  # noqa: E402
 from app.modules.tasks.models import PracticeItem, Task  # noqa: F401, E402
-from app.modules.users.models import User, UserRole  # noqa: E402
+from app.modules.users.models import User, UserAttempt, UserRole  # noqa: F401, E402
 
 
 class TemplateTestClient(AsyncClient):

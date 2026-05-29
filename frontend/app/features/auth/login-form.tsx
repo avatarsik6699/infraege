@@ -1,61 +1,86 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
+import { useProgressSync } from '@features/progress-sync/use-progress-sync';
 import { useLoginMutation } from '@shared/api/auth';
 import { useRouter } from '@shared/hooks/use-router';
 import { AppLink } from '@shared/ui/app-link';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
+import { PasswordInput } from '@shared/ui/password-input';
 
-export const DEFAULT_LOGIN_EMAIL = 'admin@example.com';
-export const DEFAULT_LOGIN_PASSWORD = 'changeme123';
-
-export function LoginForm() {
+export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
 	const router = useRouter();
 	const loginMutation = useLoginMutation();
-	const [email, setEmail] = useState(DEFAULT_LOGIN_EMAIL);
-	const [password, setPassword] = useState(DEFAULT_LOGIN_PASSWORD);
+	const { triggerSync } = useProgressSync();
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
+	const [rememberMe, setRememberMe] = useState(false);
 
 	const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
 		event.preventDefault();
 		await loginMutation.mutateAsync({ email, password });
-		router.navigate('/dashboard', { replace: true });
+		await triggerSync();
+		if (onSuccess) {
+			onSuccess();
+		} else {
+			router.navigate('/profile', { replace: true });
+		}
 	};
 
 	return (
 		<form className='grid gap-4' onSubmit={onSubmit}>
 			<div className='grid gap-1.5'>
-				<Label htmlFor='email'>Email</Label>
+				<Label htmlFor='login-email'>Email</Label>
 				<Input
-					id='email'
+					id='login-email'
 					name='email'
 					type='email'
+					autoComplete='email'
 					value={email}
 					onChange={event => setEmail(event.target.value)}
 					required
 				/>
 			</div>
 			<div className='grid gap-1.5'>
-				<Label htmlFor='password'>Пароль</Label>
-				<Input
-					id='password'
+				<div className='flex items-center justify-between'>
+					<Label htmlFor='login-password'>Пароль</Label>
+					<span className='text-xs text-muted-foreground'>Забыл пароль? (скоро)</span>
+				</div>
+				<PasswordInput
+					id='login-password'
 					name='password'
-					type='password'
+					autoComplete='current-password'
 					value={password}
 					onChange={event => setPassword(event.target.value)}
 					required
 				/>
 			</div>
+			<label className='flex items-center gap-2 text-sm select-none cursor-pointer'>
+				<input
+					type='checkbox'
+					checked={rememberMe}
+					onChange={event => setRememberMe(event.target.checked)}
+					className='rounded'
+				/>
+				<span className='text-muted-foreground'>Запомнить меня</span>
+			</label>
 			{loginMutation.isError ? (
-				<p className='text-sm text-destructive'>Не удалось войти с этими данными.</p>
+				<p className='text-sm text-destructive'>Не удалось войти. Проверь email и пароль.</p>
 			) : null}
-			<Button type='submit' disabled={loginMutation.isPending}>
+			<Button type='submit' disabled={loginMutation.isPending} className='w-full'>
 				{loginMutation.isPending ? 'Вход...' : 'Войти'}
 			</Button>
-			<Button asChild type='button' variant='outline'>
-				<AppLink to='/topics'>Продолжить как гость</AppLink>
+			<Button asChild type='button' variant='outline' className='w-full'>
+				<AppLink to='/topics'>Решать как гость</AppLink>
 			</Button>
+			<p className='text-center text-sm text-muted-foreground'>
+				Нет аккаунта?{' '}
+				<AppLink to='/register' className='font-medium text-foreground hover:underline'>
+					Создать
+				</AppLink>
+			</p>
 		</form>
 	);
 }

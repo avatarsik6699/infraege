@@ -80,6 +80,18 @@ export function useLogoutMutation() {
 	});
 }
 
+export function useDeleteAccountMutation() {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: () => api.delete('/api/v1/public/auth/me'),
+		onSuccess: () => {
+			jwtService.set(queryClient, null);
+			queryClient.clear();
+		},
+	});
+}
+
 export function useSessionSummary() {
 	const tokenQuery = useAuthToken();
 	const meQuery = useMe();

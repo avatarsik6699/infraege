@@ -134,6 +134,41 @@ export interface paths {
         get: operations["me_api_v1_public_auth_me_get"];
         put?: never;
         post?: never;
+        /** Delete Me */
+        delete: operations["delete_me_api_v1_public_auth_me_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/progress/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sync Progress */
+        post: operations["sync_progress_api_v1_public_progress_sync_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/progress/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Progress Me */
+        get: operations["get_progress_me_api_v1_public_progress_me_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -466,6 +501,79 @@ export interface components {
          * @enum {string}
          */
         UserRole: "user" | "admin";
+        /** SyncAttemptItem */
+        SyncAttemptItem: {
+            /** Practiceitemiid */
+            practiceItemId: string;
+            /** Iscorrect */
+            isCorrect: boolean;
+            /** Attemptscount */
+            attemptsCount: number;
+            /**
+             * Lastansweredat
+             * Format: date-time
+             */
+            lastAnsweredAt: string;
+        };
+        /** ProgressSyncRequest */
+        ProgressSyncRequest: {
+            /** Attempts */
+            attempts: components["schemas"]["SyncAttemptItem"][];
+        };
+        /** ProgressSyncResponse */
+        ProgressSyncResponse: {
+            /** Synced */
+            synced: number;
+            /** Updated */
+            updated: number;
+        };
+        /** ProfileStats */
+        ProfileStats: {
+            /** Totaltasks */
+            totalTasks: number;
+            /** Solvedtasks */
+            solvedTasks: number;
+            /** Correctattempts */
+            correctAttempts: number;
+            /** Totalattempts */
+            totalAttempts: number;
+            /** Streak */
+            streak: number;
+            /** Lastactivityat */
+            lastActivityAt: string | null;
+        };
+        /** WeakTask */
+        WeakTask: {
+            /** Taskid */
+            taskId: string;
+            /** Taskslug */
+            taskSlug: string;
+            /** Tasktitle */
+            taskTitle: string;
+            /** Egenumber */
+            egeNumber: number;
+            /** Solvedcount */
+            solvedCount: number;
+            /** Totalcount */
+            totalCount: number;
+            /** Accuracy */
+            accuracy: number;
+        };
+        /** RecentActivity */
+        RecentActivity: {
+            /** Date */
+            date: string;
+            /** Count */
+            count: number;
+        };
+        /** ProfileMe */
+        ProfileMe: {
+            stats: components["schemas"]["ProfileStats"];
+            /** Weaktasks */
+            weakTasks: components["schemas"]["WeakTask"][];
+            /** Recentactivity */
+            recentActivity: components["schemas"]["RecentActivity"][];
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -840,6 +948,77 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_me_api_v1_public_auth_me_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    sync_progress_api_v1_public_progress_sync_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProgressSyncRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgressSyncResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_progress_me_api_v1_public_progress_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileMe"];
                 };
             };
         };

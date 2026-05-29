@@ -10,7 +10,7 @@ from app.modules.auth.schemas import (
     TokenPair,
 )
 from app.modules.auth.service import AuthService
-from app.modules.users import User, UserOut
+from app.modules.users import User, UserOut, UserService, get_user_service
 
 router = APIRouter(prefix="/public/auth", tags=["auth"])
 
@@ -53,3 +53,11 @@ async def me(current_user: User = Depends(get_current_user)) -> UserOut:
 @router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(_current_user: User = Depends(get_current_user)) -> dict[str, str]:
     return {"message": "Logged out"}
+
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_me(
+    current_user: User = Depends(get_current_user),
+    user_service: UserService = Depends(get_user_service),
+) -> None:
+    await user_service.delete(current_user)

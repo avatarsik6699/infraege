@@ -1,30 +1,41 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
+import { useProgressSync } from '@features/progress-sync/use-progress-sync';
 import { useRegisterMutation } from '@shared/api/auth';
 import { useRouter } from '@shared/hooks/use-router';
 import { AppLink } from '@shared/ui/app-link';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
+import { PasswordInput } from '@shared/ui/password-input';
+import { computePasswordStrength, PasswordStrengthBar } from '@shared/ui/password-strength';
 
-export function RegisterForm() {
+export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
 	const router = useRouter();
 	const registerMutation = useRegisterMutation();
+	const { triggerSync } = useProgressSync();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [consent, setConsent] = useState(false);
-	const [blocked, setBlocked] = useState(false);
+	const [consentError, setConsentError] = useState(false);
+
+	const strength = computePasswordStrength(password);
 
 	const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
 		event.preventDefault();
 		if (!consent) {
-			setBlocked(true);
+			setConsentError(true);
 			return;
 		}
-		setBlocked(false);
+		setConsentError(false);
 		await registerMutation.mutateAsync({ email, password, consent_152fz: true });
-		router.navigate('/dashboard', { replace: true });
+		await triggerSync();
+		if (onSuccess) {
+			onSuccess();
+		} else {
+			router.navigate('/profile', { replace: true });
+		}
 	};
 
 	return (
@@ -34,6 +45,7 @@ export function RegisterForm() {
 				<Input
 					id='register-email'
 					type='email'
+					autoComplete='email'
 					value={email}
 					onChange={event => setEmail(event.target.value)}
 					required
@@ -41,34 +53,56 @@ export function RegisterForm() {
 			</div>
 			<div className='grid gap-1.5'>
 				<Label htmlFor='register-password'>Пароль</Label>
-				<Input
+				<PasswordInput
 					id='register-password'
-					type='password'
+					autoComplete='new-password'
 					value={password}
 					onChange={event => setPassword(event.target.value)}
 					minLength={8}
 					required
 				/>
+				<PasswordStrengthBar strength={strength} />
 			</div>
-			<label className='flex items-start gap-2 text-sm'>
+			<label className='flex items-start gap-2 text-sm cursor-pointer'>
 				<input
-					className='mt-1'
+					className='mt-0.5 rounded'
 					type='checkbox'
 					checked={consent}
-					onChange={event => setConsent(event.target.checked)}
+					onChange={event => {
+						setConsent(event.target.checked);
+						if (event.target.checked) setConsentError(false);
+					}}
 				/>
-				<span>Я согласен на обработку персональных данных по 152-ФЗ.</span>
+				<span className='text-muted-foreground leading-snug'>
+					Я согласен на обработку персональных данных по{' '}
+					<AppLink to='/privacy' className='underline text-foreground'>
+						152&#8209;ФЗ
+					</AppLink>{' '}
+					(
+					<AppLink to='/terms' className='underline text-foreground'>
+						условия
+					</AppLink>
+					)
+				</span>
 			</label>
-			{blocked ? <p className='text-sm text-destructive'>Согласие обязательно для создания аккаунта.</p> : null}
-			{registerMutation.isError ? (
-				<p className='text-sm text-destructive'>Не удалось создать аккаунт.</p>
+			{consentError ? (
+				<p className='text-sm text-destructive'>Согласие обязательно для создания аккаунта.</p>
 			) : null}
-			<Button type='submit' disabled={registerMutation.isPending}>
+			{registerMutation.isError ? (
+				<p className='text-sm text-destructive'>Не удалось создать аккаунт. Попробуй снова.</p>
+			) : null}
+			<Button type='submit' disabled={registerMutation.isPending} className='w-full'>
 				{registerMutation.isPending ? 'Создание...' : 'Создать аккаунт'}
 			</Button>
-			<Button asChild type='button' variant='outline'>
+			<Button asChild type='button' variant='outline' className='w-full'>
 				<AppLink to='/topics'>Продолжить как гость</AppLink>
 			</Button>
+			<p className='text-center text-sm text-muted-foreground'>
+				Уже есть аккаунт?{' '}
+				<AppLink to='/login' className='font-medium text-foreground hover:underline'>
+					Войти
+				</AppLink>
+			</p>
 		</form>
 	);
 }

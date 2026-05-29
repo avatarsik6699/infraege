@@ -2,7 +2,8 @@ from uuid import UUID
 
 from app.modules.users.exceptions import UserNotFound
 from app.modules.users.models import User
-from app.modules.users.repository import UserRepository
+from app.modules.users.repository import UserAttemptRepository, UserRepository
+from app.modules.users.schemas import ProfileMe, ProgressSyncRequest, ProgressSyncResponse
 
 
 class UserService:
@@ -29,3 +30,15 @@ class UserService:
 
     async def delete(self, user: User) -> None:
         await self._repository.delete(user)
+
+
+class ProgressService:
+    def __init__(self, repository: UserAttemptRepository) -> None:
+        self._repository = repository
+
+    async def sync(self, user_id: UUID, payload: ProgressSyncRequest) -> ProgressSyncResponse:
+        synced, updated = await self._repository.bulk_sync(user_id, payload.attempts)
+        return ProgressSyncResponse(synced=synced, updated=updated)
+
+    async def get_profile_me(self, user_id: UUID) -> ProfileMe:
+        return await self._repository.get_profile_me(user_id)

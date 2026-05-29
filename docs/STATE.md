@@ -19,6 +19,7 @@
 | PHASE_02 | ✅ done | v0.02.0 | ✅ | 🤖 agent | Content Model + Authoring Pipeline |
 | PHASE_03 | ✅ done | v0.03.0 | ✅ | 🤖 agent | Public Catalog + SSR Theory |
 | PHASE_04 | ✅ done | v0.04.0 | ✅ | 🤖 agent | Practice Trainer + Guest Progress |
+| PHASE_05 | ✅ done | v0.05.0 | ✅ | 🤖 agent | Account/Profile + Sync |
 
 <!-- Add new rows here via /phase-init N -->
 

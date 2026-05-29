@@ -124,9 +124,14 @@ async def test_logout_without_token(client: AsyncClient) -> None:
     assert resp.status_code == 401
 
 
-async def test_account_deletion_is_out_of_phase_01(
+async def test_delete_me_returns_204(
     client: AsyncClient,
     access_headers: dict[str, str],
 ) -> None:
     resp = await client.delete("/api/v1/public/auth/me", headers=access_headers)
-    assert resp.status_code == 405
+    assert resp.status_code == 204
+
+
+async def test_delete_me_without_token(client: AsyncClient) -> None:
+    resp = await client.delete("/api/v1/public/auth/me")
+    assert resp.status_code == 401

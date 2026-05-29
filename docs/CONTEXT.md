@@ -5,14 +5,14 @@
   },
 
   "captured_at": "2026-05-29",
-  "phase_completed": "04",
+  "phase_completed": "05",
   "phase_in_progress": null,
 
   "product": {
     "name": "infraege",
     "production_domain": "infraege.ru",
     "spec_version": "v2.1",
-    "status": "phase_04_complete"
+    "status": "phase_05_complete"
   },
 
   "stack": {
@@ -48,7 +48,16 @@
     "PracticeValidationResponse",
     "GuestProgressAttempt",
     "GuestProgressState",
-    "PracticeTrainerState"
+    "PracticeTrainerState",
+    "UserAttempt",
+    "SyncAttemptItem",
+    "ProgressSyncRequest",
+    "ProgressSyncResponse",
+    "ProfileStats",
+    "WeakTask",
+    "RecentActivity",
+    "ProfileMe",
+    "PasswordStrength"
   ],
 
   "planned_contract": {
@@ -133,6 +142,24 @@
       "path": "/api/v1/public/validate",
       "auth": "none",
       "contract": "{item_id, answer} -> {correct, expected_value?, explanation_html?}; input length capped, regex execution hard-timeout, no raw answers logged."
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/public/auth/me",
+      "auth": "user",
+      "contract": "204 No Content; cascades user_attempts deletion for the authenticated user."
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/public/progress/sync",
+      "auth": "user",
+      "contract": "{attempts: SyncAttemptItem[]} (max 300) -> {synced: number, updated: number}; ON CONFLICT upsert merging guest attempts into user_attempts."
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/public/progress/me",
+      "auth": "user",
+      "contract": "{stats: ProfileStats, weakTasks: WeakTask[], recentActivity: RecentActivity[]}; weak tasks are bottom-5 by accuracy; recent activity is last 30 days grouped by date."
     }
   ],
 
@@ -212,10 +239,23 @@
           "UNIQUE(task_id, source_key)"
         ],
         "notes": "Practice rows are imported from repository frontmatter and cascade when their parent task is deleted."
+      },
+      {
+        "name": "user_attempts",
+        "columns": [
+          "id UUID PRIMARY KEY DEFAULT gen_random_uuid()",
+          "user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE",
+          "practice_item_id UUID NOT NULL REFERENCES practice_items(id) ON DELETE CASCADE",
+          "is_correct BOOLEAN NOT NULL",
+          "attempts_count SMALLINT NOT NULL DEFAULT 1",
+          "last_answered_at TIMESTAMPTZ NOT NULL DEFAULT now()",
+          "UNIQUE(user_id, practice_item_id)"
+        ],
+        "notes": "Stores per-user practice attempt records. attempts_count increments on sync upsert; last_answered_at takes the later value on conflict. Cascades on user and practice_item deletion."
       }
     ],
     "source": "alembic",
-    "current_head": "0002_content_model"
+    "current_head": "0003_user_attempts"
   },
 
   "ui_pages_active": [
@@ -256,5 +296,5 @@
 
   "db_seeds": {},
 
-  "notes": "Phase 04 complete. Added public practice read and validation endpoints, client-side practice trainer with guest progress localStorage store."
+  "notes": "Phase 05 complete. Added user_attempts table, DELETE /auth/me, POST /progress/sync, GET /progress/me endpoints, completed login/register UI with password-strength meter, progress sync flow merging guest localStorage on auth, and /profile page with stats, weak-task list, activity chart, and account deletion."
 }
