@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useAuthToken } from '@shared/api/auth';
+import { useSessionSummary } from '@shared/api/auth';
 import { useRouter } from '@shared/hooks/use-router';
 import { isNonEmptyString } from '@shared/lib/type-guards';
 
@@ -10,21 +10,22 @@ export function shouldRedirectToLogin(accessToken?: string): boolean {
 
 export function useAuthGuard() {
 	const router = useRouter();
-	const tokenQuery = useAuthToken();
+	const { isAuthenticated, isAuthReady, accessToken } = useSessionSummary();
 
 	useEffect(
 		function redirectToLoginFx() {
-			if (shouldRedirectToLogin(tokenQuery.data?.access_token)) {
+			if (isAuthReady && shouldRedirectToLogin(accessToken ?? undefined)) {
 				router.navigate('/login', {
 					replace: true,
 					state: { from: router.location.pathname },
 				});
 			}
 		},
-		[router, tokenQuery.data?.access_token]
+		[accessToken, isAuthReady, router]
 	);
 
 	return {
-		isAuthenticated: Boolean(tokenQuery.data?.access_token),
+		isAuthenticated,
+		isAuthReady,
 	};
 }

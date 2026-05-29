@@ -120,6 +120,63 @@ async def test_sync_inserts_new_attempt(
     assert data["updated"] == 0
 
 
+async def test_sync_skips_unknown_practice_item(
+    client: AsyncClient,
+    auth_headers: dict[str, str],
+) -> None:
+    resp = await client.post(
+        "/api/v1/public/progress/sync",
+        json={
+            "attempts": [
+                {
+                    "practiceItemId": str(uuid4()),
+                    "isCorrect": True,
+                    "attemptsCount": 2,
+                    "lastAnsweredAt": "2026-05-29T10:00:00Z",
+                }
+            ]
+        },
+        headers=auth_headers,
+    )
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["synced"] == 0
+    assert data["updated"] == 0
+
+
+async def test_sync_skips_unknown_practice_item_and_syncs_valid_attempt(
+    client: AsyncClient,
+    auth_headers: dict[str, str],
+    sample_practice_item: PracticeItem,
+) -> None:
+    resp = await client.post(
+        "/api/v1/public/progress/sync",
+        json={
+            "attempts": [
+                {
+                    "practiceItemId": str(uuid4()),
+                    "isCorrect": True,
+                    "attemptsCount": 1,
+                    "lastAnsweredAt": "2026-05-29T10:00:00Z",
+                },
+                {
+                    "practiceItemId": str(sample_practice_item.id),
+                    "isCorrect": True,
+                    "attemptsCount": 2,
+                    "lastAnsweredAt": "2026-05-29T10:00:00Z",
+                },
+            ]
+        },
+        headers=auth_headers,
+    )
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["synced"] == 1
+    assert data["updated"] == 0
+
+
 async def test_sync_idempotency(
     client: AsyncClient,
     auth_headers: dict[str, str],

@@ -1,14 +1,18 @@
 import json
+import shutil
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
+from redis.asyncio import Redis
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.db.session import get_db
+from app.modules.auth.dependencies import require_admin
+from app.modules.users.models import User
 
 router = APIRouter(tags=["health"])
 
@@ -25,17 +29,36 @@ async def health(db: AsyncSession = Depends(get_db)) -> dict[str, str]:
 
 
 @router.get("/health/detailed")
-async def health_detailed(db: AsyncSession = Depends(get_db)) -> dict[str, object]:
-    checks: dict[str, str] = {}
-
+async def health_detailed(
+    _admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, object]:
+    db_status: str
     try:
         await db.execute(text("SELECT 1"))
-        checks["db"] = "ok"
+        db_status = "ok"
     except Exception:
-        checks["db"] = "error"
+        db_status = "error"
 
-    status = "ok" if all(value == "ok" for value in checks.values()) else "degraded"
-    return {"status": status, "checks": checks}
+    redis_status: str
+    try:
+        async with Redis.from_url(settings.REDIS_URL, socket_connect_timeout=2) as redis:
+            await redis.ping()
+        redis_status = "ok"
+    except Exception:
+        redis_status = "error"
+
+    usage = shutil.disk_usage("/")
+    gb = 1024 ** 3
+    used_gb = round(usage.used / gb, 2)
+    free_gb = round(usage.free / gb, 2)
+    pct = round(usage.used / usage.total * 100, 1)
+
+    return {
+        "db": db_status,
+        "redis": redis_status,
+        "disk": {"used_gb": used_gb, "free_gb": free_gb, "pct": pct},
+    }
 
 
 @router.get("/health/backup")

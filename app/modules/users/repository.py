@@ -54,9 +54,21 @@ class UserAttemptRepository:
         items: list[SyncAttemptItem],
     ) -> tuple[int, int]:
         """Upsert guest attempts. Returns (inserted, updated) counts."""
+        if not items:
+            return 0, 0
+
+        item_ids = {item.practice_item_id for item in items}
+        existing_items_result = await self._session.execute(
+            select(PracticeItem.id).where(PracticeItem.id.in_(item_ids))
+        )
+        existing_item_ids = set(existing_items_result.scalars().all())
+
         synced = 0
         updated = 0
         for item in items:
+            if item.practice_item_id not in existing_item_ids:
+                continue
+
             result = await self._session.execute(
                 select(UserAttempt).where(
                     UserAttempt.user_id == user_id,

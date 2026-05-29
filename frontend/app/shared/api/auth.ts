@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from '@shared/api/client';
 import { authQueryKeys } from '@shared/api/keys';
+import { useClientMounted } from '@shared/hooks/use-client-mounted';
 import { jwtService } from '@shared/services/jwt-service';
 import type { components } from '@shared/types/schema';
 
@@ -93,15 +94,18 @@ export function useDeleteAccountMutation() {
 }
 
 export function useSessionSummary() {
+	const isClientMounted = useClientMounted();
 	const tokenQuery = useAuthToken();
 	const meQuery = useMe();
 
 	const accessToken = tokenQuery.data?.access_token ?? null;
 	const isAuthenticated = Boolean(accessToken);
+	const isAuthReady = isClientMounted;
 
 	return {
 		accessToken,
 		isAuthenticated,
+		isAuthReady,
 		tokenQuery,
 		meQuery,
 	};

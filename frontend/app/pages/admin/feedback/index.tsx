@@ -8,7 +8,9 @@ import {
 	type FeedbackStatus,
 } from '@entities/feedback/api/feedback';
 import { feedbackQueryKeys } from '@shared/api/keys';
+import { AdminNav } from '@shared/ui/admin-nav';
 import { Button } from '@shared/ui/button';
+import { Skeleton } from '@shared/ui/skeleton';
 
 const STATUS_LABELS: Record<FeedbackStatus, string> = {
 	new: 'Новый',
@@ -85,6 +87,61 @@ const STATUS_FILTERS: Array<{ label: string; value: FeedbackStatus | undefined }
 	{ label: 'Архив', value: 'archived' },
 ];
 
+function FeedbackTableSkeleton() {
+	return (
+		<div
+			className='overflow-x-auto rounded-xl border border-border'
+			aria-busy='true'
+			aria-live='polite'
+			aria-label='Загрузка обратной связи'
+		>
+			<table className='w-full text-sm' role='table' aria-label='Загрузка списка обратной связи'>
+				<thead>
+					<tr className='border-b border-border bg-muted/50 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+						<th scope='col' className='px-4 py-3'>
+							Страница
+						</th>
+						<th scope='col' className='px-4 py-3'>
+							Сообщение
+						</th>
+						<th scope='col' className='px-4 py-3'>
+							Дата
+						</th>
+						<th scope='col' className='px-4 py-3'>
+							Статус
+						</th>
+						<th scope='col' className='px-4 py-3'>
+							Действие
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{Array.from({ length: 5 }, (_, index) => (
+						<tr key={index} className='border-b border-border last:border-0'>
+							<td className='px-4 py-3'>
+								<Skeleton className='h-4 w-24' />
+							</td>
+							<td className='px-4 py-3'>
+								<Skeleton className='h-4 w-64 max-w-full' />
+							</td>
+							<td className='px-4 py-3'>
+								<Skeleton className='h-4 w-24' />
+							</td>
+							<td className='px-4 py-3'>
+								<Skeleton className='h-6 w-20 rounded-full' />
+							</td>
+							<td className='px-4 py-3'>
+								<Skeleton className='h-6 w-24' />
+							</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+			<span className='sr-only'>Загрузка...</span>
+		</div>
+	);
+}
+
 export function AdminFeedbackPage() {
 	const queryClient = useQueryClient();
 	const [page, setPage] = useState(1);
@@ -95,13 +152,11 @@ export function AdminFeedbackPage() {
 
 	const { data, isLoading, isError } = useQuery({
 		queryKey,
-		queryFn: ({ signal }) =>
-			listAdminFeedback({ page, per_page: perPage, status: statusFilter ?? null }, signal),
+		queryFn: ({ signal }) => listAdminFeedback({ page, per_page: perPage, status: statusFilter ?? null }, signal),
 	});
 
 	const patchMutation = useMutation({
-		mutationFn: ({ id, status }: { id: string; status: FeedbackStatus }) =>
-			patchFeedbackStatus(id, { status }),
+		mutationFn: ({ id, status }: { id: string; status: FeedbackStatus }) => patchFeedbackStatus(id, { status }),
 		onSuccess: () => {
 			void queryClient.invalidateQueries({ queryKey: feedbackQueryKeys.adminList() });
 		},
@@ -113,6 +168,7 @@ export function AdminFeedbackPage() {
 		<main className='page-shell'>
 			<div className='mx-auto max-w-5xl px-4 py-8'>
 				<h1 className='text-2xl font-bold mb-6'>Обратная связь</h1>
+				<AdminNav />
 
 				<div role='group' aria-label='Фильтр по статусу' className='flex flex-wrap gap-2 mb-6'>
 					{STATUS_FILTERS.map(f => (
@@ -131,9 +187,7 @@ export function AdminFeedbackPage() {
 				</div>
 
 				{isLoading ? (
-					<p className='text-muted-foreground' aria-busy='true'>
-						Загрузка...
-					</p>
+					<FeedbackTableSkeleton />
 				) : isError ? (
 					<p className='text-destructive' role='alert'>
 						Не удалось загрузить данные.

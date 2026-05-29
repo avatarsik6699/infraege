@@ -25,3 +25,8 @@ export const feedbackQueryKeys = {
 	adminList: (filters?: { page?: number; perPage?: number; status?: string }) =>
 		['feedback', 'admin', 'list', filters ?? {}] as const,
 };
+
+export const analyticsQueryKeys = {
+	pageviews: () => ['analytics', 'pageviews'] as const,
+	detailedHealth: () => ['health', 'detailed'] as const,
+};

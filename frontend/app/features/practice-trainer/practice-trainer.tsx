@@ -17,10 +17,58 @@ import { AppLink } from '@shared/ui/app-link';
 import { Button } from '@shared/ui/button';
 import { CodeBlock } from '@shared/ui/code-block';
 import { Input } from '@shared/ui/input';
+import { Skeleton } from '@shared/ui/skeleton';
 
 type PracticeTrainerProps = {
 	taskId: string;
 };
+
+function PracticeTrainerSkeleton() {
+	return (
+		<main className='page-shell practice-page' aria-busy='true' aria-live='polite' aria-label='Загрузка тренажера'>
+			<header className='practice-header'>
+				<div className='space-y-3'>
+					<Skeleton className='h-3 w-24' />
+					<Skeleton className='h-10 w-full max-w-lg' />
+					<Skeleton className='h-5 w-full max-w-xl' />
+				</div>
+				<div className='practice-header-meta'>
+					<Skeleton className='h-7 w-10' />
+					<Skeleton className='h-3 w-12' />
+				</div>
+			</header>
+			<section className='practice-progress'>
+				<div>
+					<Skeleton className='h-4 w-36' />
+					<Skeleton className='h-4 w-10' />
+				</div>
+				<Skeleton className='h-2 w-full rounded-full' />
+			</section>
+			<section className='practice-layout'>
+				<article className='practice-task-panel'>
+					<div className='practice-task-meta'>
+						<Skeleton className='h-6 w-20' />
+						<Skeleton className='h-6 w-14' />
+					</div>
+					<Skeleton className='h-5 w-full' />
+					<Skeleton className='h-5 w-11/12' />
+					<Skeleton className='h-28 w-full' />
+				</article>
+				<div className='practice-answer-panel'>
+					<Skeleton className='h-4 w-16' />
+					<Skeleton className='h-11 w-full' />
+					<Skeleton className='h-24 w-full' />
+					<div className='practice-actions'>
+						<Skeleton className='h-9 w-full' />
+						<Skeleton className='h-9 w-full' />
+						<Skeleton className='h-9 w-full' />
+					</div>
+				</div>
+			</section>
+			<span className='sr-only'>Загружаем тренажер</span>
+		</main>
+	);
+}
 
 export function PracticeTrainer({ taskId }: PracticeTrainerProps) {
 	const practiceQuery = useQuery(publicPracticeQueryOptions(taskId));
@@ -54,15 +102,7 @@ export function PracticeTrainer({ taskId }: PracticeTrainerProps) {
 	});
 
 	if (practiceQuery.isPending) {
-		return (
-			<main className='page-shell practice-page'>
-				<section className='practice-state-panel' aria-live='polite'>
-					<Loader2 aria-hidden='true' className='size-5 animate-spin' />
-					<h1 className='serif page-title'>Загружаем тренажер</h1>
-					<p>Подготавливаем задания и локальный прогресс.</p>
-				</section>
-			</main>
-		);
+		return <PracticeTrainerSkeleton />;
 	}
 
 	if (practiceQuery.isError) {

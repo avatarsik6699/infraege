@@ -28,13 +28,11 @@ function Logo() {
 	);
 }
 
-const NAV_LINKS = [
-	{ to: '/topics', label: 'Темы', matchPrefixes: ['/topics', '/tasks', '/practice'] },
-];
+const NAV_LINKS = [{ to: '/topics', label: 'Темы', matchPrefixes: ['/topics', '/tasks', '/practice'] }];
 
 export function AppTopBar() {
 	const location = useLocation();
-	const { isAuthenticated, meQuery } = useSessionSummary();
+	const { isAuthenticated, isAuthReady, meQuery } = useSessionSummary();
 	const isAdmin = meQuery.data?.role === 'admin';
 
 	if (HIDDEN_ROUTES.has(location.pathname)) return null;
@@ -82,7 +80,9 @@ export function AppTopBar() {
 				})}
 			</nav>
 
-			{isAuthenticated ? (
+			{!isAuthReady ? (
+				<div aria-hidden='true' className='h-10 w-10' />
+			) : isAuthenticated ? (
 				<AppLink
 					to='/profile'
 					aria-label='Профиль'

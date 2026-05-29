@@ -3,8 +3,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { progressQueryKeys } from '@shared/api/keys';
 import type { ProfileMe } from '@entities/user/model/user.types';
+import { authQueryKeys, progressQueryKeys } from '@shared/api/keys';
 
 const emptyProfile: ProfileMe = {
 	stats: {
@@ -44,17 +44,36 @@ const filledProfile: ProfileMe = {
 
 class MemoryStorage implements Storage {
 	private values = new Map<string, string>();
-	get length() { return this.values.size; }
-	clear() { this.values.clear(); }
-	getItem(key: string) { return this.values.get(key) ?? null; }
-	key(index: number) { return [...this.values.keys()][index] ?? null; }
-	removeItem(key: string) { this.values.delete(key); }
-	setItem(key: string, value: string) { this.values.set(key, value); }
+	get length() {
+		return this.values.size;
+	}
+	clear() {
+		this.values.clear();
+	}
+	getItem(key: string) {
+		return this.values.get(key) ?? null;
+	}
+	key(index: number) {
+		return [...this.values.keys()][index] ?? null;
+	}
+	removeItem(key: string) {
+		this.values.delete(key);
+	}
+	setItem(key: string, value: string) {
+		this.values.set(key, value);
+	}
 }
 
-async function renderProfile(profileData?: ProfileMe): Promise<string> {
+async function renderProfile(profileData?: ProfileMe, authenticated = false): Promise<string> {
 	const { default: ProfilePage } = await import('@pages/profile');
 	const queryClient = new QueryClient();
+	if (authenticated) {
+		queryClient.setQueryData(authQueryKeys.token, {
+			access_token: 'access',
+			refresh_token: 'refresh',
+			token_type: 'bearer',
+		});
+	}
 	if (profileData) {
 		queryClient.setQueryData(progressQueryKeys.me, profileData);
 	}
@@ -82,16 +101,23 @@ describe('ProfilePage', () => {
 		vi.unstubAllGlobals();
 	});
 
-	it('shows login CTA when unauthenticated (no token in store)', async () => {
+	it('shows neutral loading state before client auth readiness', async () => {
 		const html = await renderProfile();
-		// Without a token, profile shows the login prompt
 		expect(html).toContain('Профиль');
-		expect(html).toContain('/login');
+		expect(html).toContain('Загрузка статистики');
+		expect(html).not.toContain('Войди в аккаунт, чтобы видеть прогресс');
 	});
 
 	it('renders empty profile message for zero stats', async () => {
 		const html = await renderProfile(emptyProfile);
 		expect(html).toContain('Профиль');
+	});
+
+	it('does not render logged-out CTA for cached authenticated token before readiness', async () => {
+		const html = await renderProfile(emptyProfile, true);
+		expect(html).toContain('Профиль');
+		expect(html).not.toContain('Войди в аккаунт, чтобы видеть прогресс');
+		expect(html).not.toContain('/login');
 	});
 });
 

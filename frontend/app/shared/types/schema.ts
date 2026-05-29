@@ -311,6 +311,40 @@ export interface paths {
         patch: operations["update_feedback_status_api_v1_admin_feedback__report_id__patch"];
         trace?: never;
     };
+    "/api/v1/public/events/pageview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Pageview */
+        post: operations["record_pageview_api_v1_public_events_pageview_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/analytics/pageviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Pageview Stats */
+        get: operations["get_pageview_stats_api_v1_admin_analytics_pageviews_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -678,6 +712,57 @@ export interface components {
             /** Recentactivity */
             recentActivity: components["schemas"]["RecentActivity"][];
         };
+        /** PageviewRequest */
+        PageviewRequest: {
+            /** Path */
+            path: string;
+            /** Referrer */
+            referrer?: string | null;
+            /** Session Id */
+            session_id?: string | null;
+        };
+        /** PageviewResponse */
+        PageviewResponse: {
+            /** Ok */
+            ok: boolean;
+        };
+        /** TopPage */
+        TopPage: {
+            /** Path */
+            path: string;
+            /** Views */
+            views: number;
+        };
+        /** DailyViews */
+        DailyViews: {
+            /** Date */
+            date: string;
+            /** Views */
+            views: number;
+        };
+        /** PageviewStats */
+        PageviewStats: {
+            /** Top Pages */
+            top_pages: components["schemas"]["TopPage"][];
+            /** Daily */
+            daily: components["schemas"]["DailyViews"][];
+        };
+        /** DetailedHealth */
+        DetailedHealth: {
+            /** Db */
+            db: "ok" | "error";
+            /** Redis */
+            redis: "ok" | "error";
+            /** Disk */
+            disk: {
+                /** Used Gb */
+                used_gb: number;
+                /** Free Gb */
+                free_gb: number;
+                /** Pct */
+                pct: number;
+            };
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -759,9 +844,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        [key: string]: unknown;
-                    };
+                    "application/json": components["schemas"]["DetailedHealth"];
                 };
             };
         };
@@ -1180,6 +1263,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FeedbackListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_pageview_stats_api_v1_admin_analytics_pageviews_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageviewStats"];
+                };
+            };
+        };
+    };
+    record_pageview_api_v1_public_events_pageview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PageviewRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageviewResponse"];
                 };
             };
             /** @description Validation Error */

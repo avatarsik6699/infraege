@@ -12,4 +12,6 @@ export default [
 	route('privacy', './routes/privacy.tsx'),
 	route('terms', './routes/terms.tsx'),
 	route('admin/feedback', './routes/admin-feedback.tsx'),
+	route('admin/status', './routes/admin-status.tsx'),
+	route('admin/analytics', './routes/admin-analytics.tsx'),
 ];

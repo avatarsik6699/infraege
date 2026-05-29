@@ -81,6 +81,37 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
 					Создать
 				</AppLink>
 			</p>
+			{import.meta.env.DEV ? (
+				<div className='border border-dashed border-muted rounded p-3 grid gap-2'>
+					<p className='text-xs text-muted-foreground font-medium'>Dev: быстрый вход</p>
+					<div className='flex gap-2'>
+						<Button
+							type='button'
+							variant='outline'
+							size='sm'
+							className='flex-1 text-xs'
+							onClick={() => {
+								setEmail('admin@example.com');
+								setPassword('Admin1234!');
+							}}
+						>
+							Администратор
+						</Button>
+						<Button
+							type='button'
+							variant='outline'
+							size='sm'
+							className='flex-1 text-xs'
+							onClick={() => {
+								setEmail('user@example.com');
+								setPassword('User1234!');
+							}}
+						>
+							Студент
+						</Button>
+					</div>
+				</div>
+			) : null}
 		</form>
 	);
 }

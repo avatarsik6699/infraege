@@ -49,11 +49,13 @@ export default function HomePage() {
 				</section>
 			</header>
 
-		<section className='max-w-2xl border-t border-border pt-12 pb-16' aria-labelledby='feedback-heading'>
-			<h2 id='feedback-heading' className='text-xl font-semibold mb-1'>Обратная связь</h2>
-			<p className='text-sm text-muted-foreground mb-6'>Нашли ошибку или хотите что-то улучшить? Напишите нам.</p>
-			<FeedbackForm />
-		</section>
+			<section className='max-w-2xl border-t border-border pt-12 pb-16' aria-labelledby='feedback-heading'>
+				<h2 id='feedback-heading' className='text-xl font-semibold mb-1'>
+					Обратная связь
+				</h2>
+				<p className='text-sm text-muted-foreground mb-6'>Нашли ошибку или хотите что-то улучшить? Напишите нам.</p>
+				<FeedbackForm />
+			</section>
 		</main>
 	);
 }

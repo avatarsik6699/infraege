@@ -8,7 +8,7 @@
 |-------|-------|
 | Phase | `07` |
 | Title | Production Readiness |
-| Status | `⏳ pending` |
+| Status | `✅ done` |
 | Tag | `v0.07.0` |
 | Depends on | PHASE_06 gate passing |
 
@@ -29,29 +29,29 @@ Phase 07 prepares `infraege.ru` for public release. It finalizes existing produc
 
 ### Backend
 
-- [ ] `B1` Verify and harden `app/core/middleware.py` — request ID propagation on every response, sensitive value scrubbing from logs (`password`, `token`, `authorization`) — _Depends on:_ —
-- [ ] `B2` Add `GET /api/v1/health/detailed` (admin-only) — returns DB connectivity, Redis ping, and host disk usage — _Depends on:_ `B1`
-- [ ] `B3` Add `POST /api/v1/public/events/pageview` and `GET /api/v1/admin/analytics/pageviews` — page view logging to `page_events` table; rate-limited; admin aggregation endpoint — _Depends on:_ —
+- [x] `B1` Verify and harden `app/core/middleware.py` — request ID propagation on every response, sensitive value scrubbing from logs (`password`, `token`, `authorization`) — _Depends on:_ —
+- [x] `B2` Add `GET /api/v1/health/detailed` (admin-only) — returns DB connectivity, Redis ping, and host disk usage — _Depends on:_ `B1`
+- [x] `B3` Add `POST /api/v1/public/events/pageview` and `GET /api/v1/admin/analytics/pageviews` — page view logging to `page_events` table; rate-limited; admin aggregation endpoint — _Depends on:_ —
 
 ### Frontend
 
-- [ ] `F1` Internal analytics client — inject a tiny inline script in `root.tsx` that fires `POST /api/v1/public/events/pageview` on navigation; no third-party script — _Depends on:_ `B3`
-- [ ] `F2` Admin page `/admin/status` — polls `GET /api/v1/health/detailed`, displays DB / Redis / disk health tiles with color-coded status — _Depends on:_ `B2`
-- [ ] `F3` Admin page `/admin/analytics` — shows page view stats from `GET /api/v1/admin/analytics/pageviews`: top pages table, views per day chart (last 30 days) — _Depends on:_ `B3`
+- [x] `F1` Internal analytics client — inject a tiny inline script in `root.tsx` that fires `POST /api/v1/public/events/pageview` on navigation; no third-party script — _Depends on:_ `B3`
+- [x] `F2` Admin page `/admin/status` — polls `GET /api/v1/health/detailed`, displays DB / Redis / disk health tiles with color-coded status — _Depends on:_ `B2`
+- [x] `F3` Admin page `/admin/analytics` — shows page view stats from `GET /api/v1/admin/analytics/pageviews`: top pages table, views per day chart (last 30 days) — _Depends on:_ `B3`
 
 ### Infra
 
-- [ ] `I1` Finalize `nginx/nginx.conf` — confirm `[DOMAIN]` substitution handled by `scripts/setup-prod.sh`, verify HSTS max-age ≥ 1 year, review CSP directives — _Depends on:_ —
-- [ ] `I2` Verify long-lived cache headers in `nginx/nginx.conf` for hashed static assets (`/assets/`) — _Depends on:_ `I1`
-- [ ] `I3` Finalize `docker-compose.prod.yml` + `scripts/setup-prod.sh` — verify env generation covers all required keys, no dev bind-mounts leak, health-check guards in place — _Depends on:_ `I1`
+- [x] `I1` Finalize `nginx/nginx.conf` — confirm `[DOMAIN]` substitution handled by `scripts/setup-prod.sh`, verify HSTS max-age ≥ 1 year, review CSP directives — _Depends on:_ —
+- [x] `I2` Verify long-lived cache headers in `nginx/nginx.conf` for hashed static assets (`/assets/`) — _Depends on:_ `I1`
+- [x] `I3` Finalize `docker-compose.prod.yml` + `scripts/setup-prod.sh` — verify env generation covers all required keys, no dev bind-mounts leak, health-check guards in place — _Depends on:_ `I1`
 - [ ] ~~`I4`~~ (removed, deferred — daily encrypted backup job → future phase)
 - [ ] ~~`I5`~~ (removed, deferred — restore drill → future phase)
-- [ ] `I6` Wire up Gatus monitoring (dashboard-only, no external alerts) — apply `ops/gatus/config.yaml` via `docker-compose.monitoring.yml`; document SSH tunnel access in runbook — _Depends on:_ `I3`
-- [ ] `I7` Host security hardening — finalize `ops/fail2ban/jail.local.template` into a deployable `ops/fail2ban/jail.local`; document UFW rules and SSH hardening steps in `docs/production-security.md` — _Depends on:_ `I3`
+- [x] `I6` Wire up Gatus monitoring (dashboard-only, no external alerts) — apply `ops/gatus/config.yaml` via `docker-compose.monitoring.yml`; document SSH tunnel access in runbook — _Depends on:_ `I3`
+- [x] `I7` Host security hardening — finalize `ops/fail2ban/jail.local.template` into a deployable `ops/fail2ban/jail.local`; document UFW rules and SSH hardening steps in `docs/production-security.md` — _Depends on:_ `I3`
 
 ### Other
 
-- [ ] `T1` Verify and update `docs/production-runbook.md` — cover deployment, rollback, monitoring via SSH tunnel, and security response; remove backup-drill steps (deferred) — _Depends on:_ `I6`, `I7`
+- [x] `T1` Verify and update `docs/production-runbook.md` — cover deployment, rollback, monitoring via SSH tunnel, and security response; remove backup-drill steps (deferred) — _Depends on:_ `I6`, `I7`
 
 ---
 
@@ -227,7 +227,44 @@ The agent resolves these items through `/impl-review-notes 07`. Leave an item un
 is still open. Check it off only after the fix is implemented and re-verified. If manual
 verification found nothing, keep the default checked line below.
 
-- [x] No architect review issues recorded
+- [x] При открытии приложения в браузере я сразу же получаю ошибку по эндпоинту /api/v1/public/events/pageview POST 404 Not Found {"path": "/login","session_id": "6059ebc648f5f456"}. Выясни в чем проблема, исправь ошибку.
+
+- [x] Мне не нравится то, что при входе в системе, в dev режиме/при разработке, мне всегда надо вручную вводить тестовые данные для админ аккаунта или для аккаунта студента. Я хочу упростить этот процесс - добавить в форму входа секцию с функционалом предзаполнения данных для входа в аккаунт стуенда или админа.
+
+- [x] При входе в аккаунт админа/студента я сразу же получаю ошибку 500 Internal Server Error /api/v1/public/progress/sync {
+    "attempts": [
+        {
+            "practiceItemId": "3f2b596d-3702-4f9d-ac37-d8ee95c45e53",
+            "isCorrect": true,
+            "attemptsCount": 2,
+            "lastAnsweredAt": "2026-05-28T21:17:15.021Z"
+        },
+        {
+            "practiceItemId": "e22283bd-5c1f-4f8a-ad91-627ad78f61ef",
+            "isCorrect": true,
+            "attemptsCount": 1,
+            "lastAnsweredAt": "2026-05-29T12:03:54.633Z"
+        },
+        {
+            "practiceItemId": "b358c788-65ef-43e6-9db6-9c2d58c7b50b",
+            "isCorrect": true,
+            "attemptsCount": 2,
+            "lastAnsweredAt": "2026-05-29T15:18:38.316Z"
+        }
+    ]
+}
+
+- [x] Я авторизовался в системе через аккаунт админа/студента. Далее я перезагружаю страницу браузера и получаю на мгновение секцию с текстом "Войдите в профиль, чтобы видеть прогресс". Предполагаю что это связано как-то с тем, что система ещё не успела прочитать токен авторизации или проверить авторизован пользователь или нет, но уже показывает экран о том, что якобы пользователь не авторизован, а затем экран пропадает после того, как авторизация проверена. Таких ситуаций в целом не должно быть в рамках системы, всё должно работать плавно и бесшовно. Не должно быть никаких мерцаний экрана и промежуточных состояний. Сделай детальный анализ кода, выяви такие места, а затем реши данную проблему.
+
+- [x] Добавь элемент NavigationProgress. Изучи как реализовать NavigationProgress в связке с shadcn + react-router v7, сделай план разработки, а затем имплементируй его.
+
+- [x] Улучши стилизацию скроллбара в рамках приложения. Сделай его в стиле минимализма. Добейся продвинутого UI/UX в этом плане, используй лучшие практики
+
+- [x] Улучши стилизацию для компонентов загрузки в рамках приложения. Хочу чтобы загрузка элементов по возможности происходила в параллельном режиме и через использование skeleton. Добейся продвинутого UI/UX в этом плане, используй лучшие практики.
+
+- [x] В верстке глобально присутствует проблема, связанная с тем, что происходят layout shifting, т.к. в разных местах скролл в рамках страницы может появляться и исчезать, что приводит к "скачкам" блоков в рамках всего интерфейса. Это негативно влияет на различные метрики и создает негативный пользовательский опыт. Предлагаю исследовать этот вопрос и разработать план по исправлению данной проблемы.
+
+- [x] В рамках 7 фазы был реализован функционал и маршруты роутинга на которые я не могу перейти и посмотреть информацию. Вероятно у нас недостаточно e2e тестов, которые проверяют сценарии и реализованный функционал, из-за чего возникают подобные проблемы. Реши данную проблему.
 
 ---
 

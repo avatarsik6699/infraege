@@ -4,10 +4,11 @@ import { progressQueryKeys } from '@shared/api/keys';
 
 import { getProgressMe, syncProgress } from './users';
 
-export function useProgressMeQuery() {
+export function useProgressMeQuery(options: { enabled?: boolean } = {}) {
 	return useQuery({
 		queryKey: progressQueryKeys.me,
 		queryFn: getProgressMe,
+		enabled: options.enabled,
 	});
 }
 

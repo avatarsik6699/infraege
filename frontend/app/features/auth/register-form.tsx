@@ -85,9 +85,7 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
 					)
 				</span>
 			</label>
-			{consentError ? (
-				<p className='text-sm text-destructive'>Согласие обязательно для создания аккаунта.</p>
-			) : null}
+			{consentError ? <p className='text-sm text-destructive'>Согласие обязательно для создания аккаунта.</p> : null}
 			{registerMutation.isError ? (
 				<p className='text-sm text-destructive'>Не удалось создать аккаунт. Попробуй снова.</p>
 			) : null}

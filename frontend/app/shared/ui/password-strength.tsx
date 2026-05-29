@@ -39,10 +39,7 @@ export function PasswordStrengthBar({ strength }: { strength: PasswordStrength }
 				{([1, 2, 3, 4] as const).map(level => (
 					<div
 						key={level}
-						className={cn(
-							'h-1 flex-1 rounded-full transition-colors',
-							level <= strength ? color : 'bg-muted'
-						)}
+						className={cn('h-1 flex-1 rounded-full transition-colors', level <= strength ? color : 'bg-muted')}
 					/>
 				))}
 			</div>

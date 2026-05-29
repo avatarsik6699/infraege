@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT_SLUG="${1:?usage: ./scripts/setup-prod.sh <project-slug> <domain>}"
-DOMAIN="${2:?usage: ./scripts/setup-prod.sh <project-slug> <domain>}"
+PROJECT_SLUG="${1:?usage: ./scripts/setup-prod.sh <project-slug> <domain> <letsencrypt-email>}"
+DOMAIN="${2:?usage: ./scripts/setup-prod.sh <project-slug> <domain> <letsencrypt-email>}"
+LETSENCRYPT_EMAIL="${3:?usage: ./scripts/setup-prod.sh <project-slug> <domain> <letsencrypt-email>}"
 DB_NAME="${PROJECT_SLUG//-/_}"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${PROJECT_ROOT}/.env"
@@ -22,6 +23,7 @@ fi
 
 POSTGRES_PASSWORD="$(random_hex 24)"
 SECRET_KEY="$(random_hex 32)"
+FEEDBACK_IP_PEPPER="$(random_hex 32)"
 
 cat > "${ENV_FILE}" <<EOF
 DATABASE_URL=postgresql+asyncpg://app_user:${POSTGRES_PASSWORD}@db:5432/${DB_NAME}
@@ -40,6 +42,10 @@ CORS_ORIGINS=["https://${DOMAIN}","https://www.${DOMAIN}"]
 APP_ENV=production
 LOG_LEVEL=INFO
 AUTH_RATE_LIMIT=20/minute
+FEEDBACK_IP_PEPPER=${FEEDBACK_IP_PEPPER}
+FEEDBACK_RATE_LIMIT=5/minute
+PAGEVIEW_RATE_LIMIT=60/minute
+LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
 
 DOMAIN=${DOMAIN}
 API_BASE_URL=https://${DOMAIN}
@@ -131,4 +137,4 @@ else
   echo "warning: docker compose not available; skipped rendered compose validation" >&2
 fi
 
-echo "Production files generated for ${PROJECT_SLUG} at ${DOMAIN}: .env, .env.backup, .env.monitoring"
+echo "Production files generated for ${PROJECT_SLUG} at ${DOMAIN} (${LETSENCRYPT_EMAIL}): .env, .env.backup, .env.monitoring"

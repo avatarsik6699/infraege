@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     AUTH_RATE_LIMIT: str = "20/minute"
     FEEDBACK_IP_PEPPER: str = "changeme-feedback-pepper-32ch"
     FEEDBACK_RATE_LIMIT: str = "5/minute"
+    PAGEVIEW_RATE_LIMIT: str = "30/minute"
     BACKUP_HEALTH_ENABLED: bool = False
     BACKUP_HEALTH_STATUS_FILE: str = "/run/app-backup/last-success.json"
     BACKUP_MAX_AGE_HOURS: int = 36

@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 from httpx import AsyncClient
 
 from app.core.config import settings
+from app.modules.users.models import UserRole
 
 
 async def test_health_returns_ok(client: AsyncClient) -> None:
@@ -19,12 +20,20 @@ async def test_health_live_returns_ok(client: AsyncClient) -> None:
     assert response.json() == {"status": "ok"}
 
 
-async def test_health_detailed_returns_dependency_status(client: AsyncClient) -> None:
-    response = await client.get("/api/v1/health/detailed")
+async def test_health_detailed_returns_dependency_status(client) -> None:
+    token = await client.create_user_token("health-admin@example.com", role=UserRole.admin)
+    response = await client.get(
+        "/api/v1/health/detailed", headers={"Authorization": f"Bearer {token}"}
+    )
     assert response.status_code == 200
     body = response.json()
-    assert body["status"] == "ok"
-    assert body["checks"]["db"] == "ok"
+    assert body["db"] == "ok"
+    assert "redis" in body
+    assert "disk" in body
+    disk = body["disk"]
+    assert "used_gb" in disk
+    assert "free_gb" in disk
+    assert "pct" in disk
 
 
 async def test_health_backup_is_disabled_by_default(client: AsyncClient) -> None:

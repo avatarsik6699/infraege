@@ -1,0 +1,45 @@
+[DEFAULT]
+bantime = 3600
+findtime = 600
+maxretry = 5
+backend = systemd
+banaction = iptables-multiport
+ignoreip = 127.0.0.1/8 ::1 REPLACE_WITH_ADMIN_IP
+
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = %(sshd_log)s
+maxretry = 3
+bantime = 86400
+
+[nginx-http-auth]
+enabled = true
+port = http,https
+filter = nginx-http-auth
+logpath = /opt/infraege/var/nginx-logs/error.log
+maxretry = 5
+
+[nginx-botsearch]
+enabled = true
+port = http,https
+filter = nginx-botsearch
+logpath = /opt/infraege/var/nginx-logs/access.log
+maxretry = 4
+bantime = 7200
+
+[nginx-limit-req]
+enabled = true
+port = http,https
+filter = nginx-limit-req
+logpath = /opt/infraege/var/nginx-logs/error.log
+maxretry = 10
+
+# Optional host-level Gatus proxy from ops/nginx/gatus-basic-auth.conf.
+[nginx-gatus-http-auth]
+enabled = false
+port = https
+filter = nginx-http-auth
+logpath = /var/log/nginx/gatus-error.log
+maxretry = 5

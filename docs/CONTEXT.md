@@ -5,14 +5,14 @@
   },
 
   "captured_at": "2026-05-29",
-  "phase_completed": "06",
+  "phase_completed": "07",
   "phase_in_progress": null,
 
   "product": {
     "name": "infraege",
     "production_domain": "infraege.ru",
     "spec_version": "v2.1",
-    "status": "phase_06_complete"
+    "status": "phase_07_complete"
   },
 
   "stack": {
@@ -65,7 +65,10 @@
     "FeedbackReportAdmin",
     "FeedbackStatusUpdate",
     "FeedbackListResponse",
-    "FeedbackStatus"
+    "FeedbackStatus",
+    "PageEvent",
+    "DetailedHealth",
+    "PageviewStats"
   ],
 
   "planned_contract": {
@@ -186,6 +189,24 @@
       "path": "/api/v1/admin/feedback/{id}",
       "auth": "admin",
       "contract": "{status: feedback_status} → FeedbackReportAdmin; updates review status."
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/health/detailed",
+      "auth": "admin",
+      "contract": "{db: 'ok'|'error', redis: 'ok'|'error', disk: {used_gb, free_gb, pct}}; returns DB connectivity, Redis ping, and host disk usage."
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/public/events/pageview",
+      "auth": "none",
+      "contract": "{path, referrer?, session_id} → {ok: true}; logs to page_events table; rate-limited; no IP stored."
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/analytics/pageviews",
+      "auth": "admin",
+      "contract": "{top_pages: [{path, views}], daily: [{date, views}]}; last 30 days aggregation from page_events."
     }
   ],
 
@@ -291,10 +312,22 @@
           "submitted_at TIMESTAMPTZ NOT NULL DEFAULT now()"
         ],
         "notes": "Requires feedback_status enum with new/reviewed/archived values. Raw IP addresses are never stored; ip_hash = sha256(ip + FEEDBACK_IP_PEPPER). No FK to users table."
+      },
+      {
+        "name": "page_events",
+        "columns": [
+          "id BIGSERIAL PRIMARY KEY",
+          "path VARCHAR(500) NOT NULL",
+          "referrer VARCHAR(500)",
+          "user_agent VARCHAR(300)",
+          "session_id CHAR(16)",
+          "created_at TIMESTAMPTZ NOT NULL DEFAULT now()"
+        ],
+        "notes": "Index on (path, created_at) for aggregation queries. No IP stored. No user_id stored. session_id is a client-generated random string with no PII."
       }
     ],
     "source": "alembic",
-    "current_head": "0004_feedback_reports"
+    "current_head": "0005_page_events"
   },
 
   "ui_pages_active": [
@@ -307,7 +340,9 @@
     "/profile",
     "/privacy",
     "/terms",
-    "/admin/feedback"
+    "/admin/feedback",
+    "/admin/status",
+    "/admin/analytics"
   ],
 
   "env_config": {
@@ -331,11 +366,12 @@
       "VITE_PUBLIC_SITE_URL",
       "VITE_PUBLIC_APP_NAME",
       "FEEDBACK_IP_PEPPER",
-      "FEEDBACK_RATE_LIMIT"
+      "FEEDBACK_RATE_LIMIT",
+      "LETSENCRYPT_EMAIL"
     ]
   },
 
   "db_seeds": {},
 
-  "notes": "Phase 06 complete. Added feedback_reports table and feedback_status enum, POST /public/feedback with honeypot and Redis rate-limit, GET/PATCH /admin/feedback admin endpoints, feedback form UI with accessible honeypot, /privacy and /terms legal pages with real SSR content, /admin/feedback paginated admin table, sitemap task slugs, Open Graph metadata on all SSR routes, and Lighthouse/accessibility fixes (ARIA, skip-to-content, focus management, contrast, tap targets)."
+  "notes": "Phase 07 complete. Added page_events table (Alembic head: 0005_page_events), GET /health/detailed admin endpoint, POST /public/events/pageview and GET /admin/analytics/pageviews analytics endpoints, internal analytics client injected in root.tsx, /admin/status health-tiles page, /admin/analytics pageviews page, Nginx HSTS/CSP hardening, Gatus monitoring via docker-compose.monitoring.yml, and fail2ban host security (ops/fail2ban/jail.local). Added LETSENCRYPT_EMAIL env var. NavigationProgress, skeleton loaders, scrollbar polish, and layout-shift fixes applied across the UI."
 }

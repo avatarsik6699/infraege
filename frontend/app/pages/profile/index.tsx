@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
+import { useProgressMeQuery } from '@entities/user/api/user-queries';
+import type { ProfileMe, ProfileStats, RecentActivity, UserOut, WeakTask } from '@entities/user/model/user.types';
 import { useDeleteAccountMutation, useLogoutMutation, useMe, useSessionSummary } from '@shared/api/auth';
 import { progressQueryKeys } from '@shared/api/keys';
 import { AppLink } from '@shared/ui/app-link';
 import { Button } from '@shared/ui/button';
-
-import { useProgressMeQuery } from '@entities/user/api/user-queries';
-import type { ProfileMe, ProfileStats, RecentActivity, UserOut, WeakTask } from '@entities/user/model/user.types';
+import { Skeleton } from '@shared/ui/skeleton';
 
 function StatTile({ label, value }: { label: string; value: string | number }) {
 	return (
@@ -77,14 +77,56 @@ function ActivityBar({ activity }: { activity: RecentActivity[] }) {
 	);
 }
 
-function DeleteAccountModal({ onClose, onConfirm, isPending }: { onClose: () => void; onConfirm: () => void; isPending: boolean }) {
+function ProfileSkeletonContent({ showHeading = true }: { showHeading?: boolean }) {
+	return (
+		<div
+			className='mx-auto w-full max-w-2xl space-y-6'
+			aria-busy='true'
+			aria-live='polite'
+			aria-label='Загрузка профиля'
+		>
+			{showHeading ? (
+				<header className='space-y-2'>
+					<h1 className='text-2xl font-semibold tracking-tight'>Профиль</h1>
+					<Skeleton className='h-4 w-56' />
+				</header>
+			) : null}
+			<div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
+				{Array.from({ length: 6 }, (_, index) => (
+					<div key={index} className='rounded-xl border border-border bg-card p-4'>
+						<Skeleton className='mx-auto h-7 w-16' />
+						<Skeleton className='mx-auto mt-3 h-3 w-24' />
+					</div>
+				))}
+			</div>
+			<section className='space-y-3'>
+				<Skeleton className='h-4 w-28' />
+				<Skeleton className='h-4 w-full' />
+				<Skeleton className='h-4 w-2/3' />
+			</section>
+			<span className='sr-only'>Загрузка статистики...</span>
+		</div>
+	);
+}
+
+function DeleteAccountModal({
+	onClose,
+	onConfirm,
+	isPending,
+}: {
+	onClose: () => void;
+	onConfirm: () => void;
+	isPending: boolean;
+}) {
 	return (
 		<div
 			role='dialog'
 			aria-modal='true'
 			aria-labelledby='delete-dialog-title'
 			className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4'
-			onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+			onClick={e => {
+				if (e.target === e.currentTarget) onClose();
+			}}
 		>
 			<div className='bg-background rounded-2xl border border-border p-6 max-w-sm w-full space-y-4 shadow-xl'>
 				<h2 id='delete-dialog-title' className='text-lg font-semibold text-destructive'>
@@ -139,7 +181,10 @@ function ProfileContent({ data, meData }: { data: ProfileMe; meData?: UserOut })
 			</section>
 
 			<section aria-labelledby='activity-heading'>
-				<h2 id='activity-heading' className='text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-3'>
+				<h2
+					id='activity-heading'
+					className='text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-3'
+				>
 					Активность за 30 дней
 				</h2>
 				<ActivityBar activity={data.recentActivity} />
@@ -171,9 +216,17 @@ function ProfileContent({ data, meData }: { data: ProfileMe; meData?: UserOut })
 }
 
 export default function ProfilePage() {
-	const { isAuthenticated } = useSessionSummary();
+	const { isAuthenticated, isAuthReady } = useSessionSummary();
 	const meQuery = useMe();
-	const progressQuery = useProgressMeQuery();
+	const progressQuery = useProgressMeQuery({ enabled: isAuthReady && isAuthenticated });
+
+	if (!isAuthReady) {
+		return (
+			<main className='shell'>
+				<ProfileSkeletonContent />
+			</main>
+		);
+	}
 
 	if (!isAuthenticated) {
 		return (
@@ -207,7 +260,7 @@ export default function ProfilePage() {
 				</header>
 
 				{progressQuery.isLoading ? (
-					<p className='text-sm text-muted-foreground'>Загрузка статистики...</p>
+					<ProfileSkeletonContent showHeading={false} />
 				) : progressQuery.isError ? (
 					<p className='text-sm text-destructive'>Не удалось загрузить статистику.</p>
 				) : progressQuery.data ? (

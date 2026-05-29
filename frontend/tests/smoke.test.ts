@@ -15,5 +15,7 @@ describe('smoke', () => {
 		expect(JSON.stringify(routes)).toContain('privacy');
 		expect(JSON.stringify(routes)).toContain('terms');
 		expect(JSON.stringify(routes)).toContain('admin/feedback');
+		expect(JSON.stringify(routes)).toContain('admin/status');
+		expect(JSON.stringify(routes)).toContain('admin/analytics');
 	});
 });

@@ -1,6 +1,6 @@
-import { guestProgressStore } from '@features/guest-progress/guest-progress-store';
 import { syncProgress } from '@entities/user/api/users';
 import type { SyncAttemptItem } from '@entities/user/model/user.types';
+import { guestProgressStore } from '@features/guest-progress/guest-progress-store';
 
 export type SyncState = 'idle' | 'syncing' | 'done' | 'error';
 

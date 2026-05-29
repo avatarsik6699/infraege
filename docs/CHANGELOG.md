@@ -6,6 +6,45 @@
 
 ---
 
+## 2026-05-29 — Phase 07 complete
+
+**Type**: phase-completion
+**Author**: AI (context-update)
+**Triggered by**: PHASE_07 gate passed and committed
+
+### Changes
+- Added `page_events` table for privacy-safe anonymous page-view logging (no IP, no user_id; client-generated `session_id`).
+- Added `GET /api/v1/health/detailed` (admin-only) returning DB connectivity, Redis ping, and host disk usage.
+- Added `POST /api/v1/public/events/pageview` — rate-limited, inserts into `page_events`; no PII stored.
+- Added `GET /api/v1/admin/analytics/pageviews` — top-pages table and daily views chart (last 30 days).
+- Added internal analytics client in `root.tsx` firing pageview events on each navigation; no third-party script.
+- Built `/admin/status` page polling `GET /health/detailed` with color-coded DB/Redis/disk health tiles.
+- Built `/admin/analytics` page rendering top-pages table and daily views chart from analytics API.
+- Finalized Nginx config: `HSTS max-age=31536000`, reviewed CSP directives, domain substitution via `setup-prod.sh`, long-lived cache headers for hashed assets.
+- Finalized `docker-compose.prod.yml` and `scripts/setup-prod.sh` — env-key coverage, no dev bind-mounts, health-check guards.
+- Wired Gatus monitoring (dashboard-only, no external alerts) via `docker-compose.monitoring.yml`; SSH tunnel access documented in runbook.
+- Added `ops/fail2ban/jail.local` finalized from template; UFW rules and SSH hardening steps documented in `docs/production-security.md`.
+- Applied UX fixes: NavigationProgress bar, skeleton loaders with parallel loading, scrollbar minimalism polish, layout-shift fixes via `overflow-y: scroll`, auth-guard flash elimination using `isClientMounted` guard.
+- Updated `docs/production-runbook.md` for revised scope (deployment, rollback, monitoring via SSH tunnel, security response).
+- Added admin navigation component (`admin-nav.tsx`), admin-analytics and admin-status e2e tests.
+
+### Affected Phases
+- None (additive change)
+
+### Contract Updates
+- Added `page_events` table (Alembic head: `0005_page_events`).
+- Added `GET /api/v1/health/detailed`: admin-only; `{db: 'ok'|'error', redis: 'ok'|'error', disk: {used_gb, free_gb, pct}}`.
+- Added `POST /api/v1/public/events/pageview`: `{path, referrer?, session_id}` → `{ok: true}`; rate-limited.
+- Added `GET /api/v1/admin/analytics/pageviews`: `{top_pages: [{path, views}], daily: [{date, views}]}`; admin-only.
+- Added interface contracts: `PageEvent`, `DetailedHealth`, `PageviewStats`.
+- Added env var: `LETSENCRYPT_EMAIL` (required for TLS certificate provisioning).
+- Added UI pages: `/admin/status`, `/admin/analytics`.
+
+### Notes
+`page_events` stores no IP addresses and no user IDs — only a client-generated random `session_id` (16 hex chars) for session-level deduplication. Backup job and external alert channels are deferred to a future phase. Gatus monitoring is SSH-tunnel-only in this phase (no public dashboard exposure).
+
+---
+
 ## 2026-05-29 — Phase 06 complete
 
 **Type**: phase-completion

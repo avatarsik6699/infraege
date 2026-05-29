@@ -26,16 +26,6 @@ endpoints:
       - "[BODY].status == ok"
       - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
 
-  - name: backend-detailed-internal
-    group: internal
-    url: http://backend:8000/api/v1/health/detailed
-    interval: ${GATUS_MONITOR_INTERVAL}
-    conditions:
-      - "[STATUS] == 200"
-      - "[BODY].status == ok"
-      - "[BODY].checks.db == ok"
-      - "[RESPONSE_TIME] < ${GATUS_RESPONSE_TIME_LIMIT}"
-
   - name: frontend-public
     group: public
     url: https://${DOMAIN}/
